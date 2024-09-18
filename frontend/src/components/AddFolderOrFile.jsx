@@ -1,0 +1,83 @@
+/* eslint-disable react/prop-types */
+import { useNavigate } from "react-router";
+import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useUpdateFolderMutation } from "../app/features/userApi";
+import { updateFolderData } from "../app/features/userSlice";
+
+function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
+  const explorerData = useSelector((state) => state.user.userFileFolder);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [updateFolder, { isLoading }] = useUpdateFolderMutation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = async (item) => {
+    try {
+      const finalTree = insertNode(explorerData, "1", item.name, isFolder);
+      const data = await updateFolder({ data: finalTree });
+
+      dispatch(updateFolderData(data?.data?.data?.userFileFolder));
+      onClose(false);
+      navigate("/files");
+    } catch (error) {
+      console.log("AddFileOrFolder error = ", error);
+    }
+  };
+
+  return (
+    <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={false}>
+      <DialogContent className="sm:max-w-[425px] p-8">
+        <DialogHeader>
+          <DialogTitle>
+            Create a new {isFolder ? "folder" : "file"}{" "}
+          </DialogTitle>
+          <DialogDescription>
+            This new {isFolder ? "folder" : "file"} will be created in the root
+            folder. To create a {isFolder ? "folder" : "file"} in a specfic
+            folder right click on that folder.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-4 "
+        >
+          <div className="flex flex-col  gap-4">
+            <Label htmlFor="name" className="text-left capitalize">
+              {isFolder ? "folder" : "file"} name
+            </Label>
+            <Input
+              id="name"
+              className="col-span-3"
+              disabled={isLoading}
+              {...register("name", { required: true })}
+            />
+
+            {errors.name && (
+              <span className="text-red-400 my-1">Name is required.</span>
+            )}
+          </div>
+          <Button type="submit" disabled={isLoading}>
+            Save changes
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default AddFileOrFolder;
