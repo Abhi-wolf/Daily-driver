@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Bell, Bookmark, CalendarDaysIcon } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,21 +23,21 @@ import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useForm } from "react-hook-form";
 import { transformDate } from "../lib/utils";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewEvent } from "../app/features/eventsSlice";
-import { useLogoutUserMutation } from "../app/features/userApi";
-import { removeUser } from "../app/features/userSlice";
 import { toast } from "sonner";
+import { useUserStore } from "../store";
+import { useLogout } from "../hooks/auth/useLogout";
+import { useGetEvent } from "../hooks/events/useGetEvents";
+import { useAddEvent } from "../hooks/events/useAddEvent";
 
 function Topbar() {
   const [selected, setSelected] = useState();
   const [isOpen, onClose] = useState(false);
-  const events = useSelector((state) => state.events.events);
-  const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const [logoutUser] = useLogoutUserMutation();
+  const { removeUser } = useUserStore();
+  const { logout, isPending } = useLogout();
 
-  const eventDays = events.map((event) => new Date(event.date));
+  const { events } = useGetEvent();
+
+  let eventDays = events?.map((event) => new Date(event.eventDate));
 
   const handleSelectDate = (date) => {
     setSelected(date);
@@ -46,9 +47,8 @@ function Topbar() {
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
-      dispatch(removeUser());
-
+      await logout();
+      removeUser();
       toast.success("Successfully logged out");
     } catch (error) {
       console.log(error);
@@ -89,12 +89,13 @@ function Topbar() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Avatar className="h-6 w-6 cursor-not-allowed">
-            <AvatarImage src={user?.profilePic} alt="@shadcn" />
+            <AvatarImage src="" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
 
           <Button
             variant="destructive"
+            disabled={isPending}
             className="h-6 rounded-md px-2 text-xs"
             onClick={() => handleLogout()}
           >
@@ -121,21 +122,39 @@ function AddEventDialog({ isOpen, onClose, selected, setSelected }) {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const dispatch = useDispatch();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    onClose(false);
+  const { addEvent, isPending } = useAddEvent();
+
+  const onSubmit = async (data) => {
     setSelected("");
 
     const newEvent = {
-      name: data?.name,
-      description: data?.description,
-      date: data.date,
-      id: String(new Date()),
+      eventName: data?.eventName,
+      eventDescription: data?.eventDescription,
+      eventDate: data.eventDate,
+      id: uuidv4(),
     };
 
-    dispatch(addNewEvent(newEvent));
+    try {
+      addEvent(
+        { newEvent },
+        {
+          onSuccess: (data) => {
+            console.log("eveny data = ", data);
+            toast.success("Event Added successfully");
+          },
+          onError: (err) => {
+            toast.error(err.message);
+            console.log(err.message);
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong.");
+    }
+
+    onClose(!isOpen);
   };
 
   return (
@@ -149,61 +168,65 @@ function AddEventDialog({ isOpen, onClose, selected, setSelected }) {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           <div className="flex flex-col   gap-4">
-            <Label htmlFor="name" className="text-left">
+            <Label htmlFor="eventName" className="text-left">
               Event Name
             </Label>
             <Input
-              id="name"
+              id="eventName"
               className="col-span-3"
-              {...register("name", { required: true })}
-              aria-invalid={errors.name ? "true" : "false"}
+              {...register("eventName", { required: true })}
+              aria-invalid={errors.eventName ? "true" : "false"}
             />
 
-            {errors.name && (
+            {errors.eventName && (
               <p className="text-red-400 text-sm">Event name is required</p>
             )}
           </div>
           <div className="flex flex-col   gap-4">
-            <Label htmlFor="description" className="text-left">
+            <Label htmlFor="eventDescription" className="text-left">
               Event Description
             </Label>
             <Textarea
               placeholder="Type your event description here."
-              id="description"
+              id="eventDescription"
               className="col-span-3"
-              {...register("description")}
+              {...register("eventDescription")}
             />
           </div>
           <div className="flex flex-col   gap-4">
-            <Label htmlFor="date" className="text-left">
+            <Label htmlFor="eventDate" className="text-left">
               From
             </Label>
             <Input
-              id="date"
+              id="eventDate"
               type="date"
               defaultValue={transformDate(selected)}
               className="col-span-3"
-              {...register("date", {
+              {...register("eventDate", {
                 required: true,
                 validate: (match) => {
                   return (
-                    transformDate(new Date()) < transformDate(match) ||
+                    transformDate(new Date()) <= transformDate(match) ||
                     "Date should be greater than or equal to today's date"
                   );
                 },
               })}
-              aria-invalid={errors.date ? "true" : "false"}
+              aria-invalid={errors.eventDate ? "true" : "false"}
             />
-            {errors.date && (
+            {errors.eventDate && (
               <p className="text-red-400 text-sm">
-                {errors.date?.message
-                  ? errors.date?.message
+                {errors.eventDate?.message
+                  ? errors.eventDate?.message
                   : "Date is required"}
               </p>
             )}
           </div>
 
-          <Button type="submit" className="justify-self-end">
+          <Button
+            type="submit"
+            className="justify-self-end"
+            disabled={isPending}
+          >
             Save changes
           </Button>
         </form>

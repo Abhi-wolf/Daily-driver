@@ -108,7 +108,6 @@ const loginUser = asyncHandler(async (req, res) => {
   // if user does not exist return new error with status code 404
   if (!existinguser) {
     throw new ApiError(404, "User does not exits");
-    // return next(new ApiError(404, "User does not exist"));
   }
 
   // verify the emtered password
@@ -145,8 +144,8 @@ const loginUser = asyncHandler(async (req, res) => {
             profilePic: existinguser.profilePic,
             userFileFolder: existinguser.userFileFolder,
           },
-          accessToken,
-          refreshToken,
+          // accessToken,
+          // refreshToken,
         },
         "User logged In Successfully"
       )
@@ -221,11 +220,10 @@ const getUser = asyncHandler(async (req, res) => {
           email: existinguser.email,
           name: existinguser.name,
           profilePic: existinguser.profilePic,
+          userFileFolder: existinguser.userFileFolder,
         },
-        accessToken,
-        refreshToken,
       },
-      "User logged In Successfully"
+      "User fetched Successfully"
     )
   );
 });
@@ -233,13 +231,13 @@ const getUser = asyncHandler(async (req, res) => {
 const updateFolder = asyncHandler(async (req, res) => {
   try {
     const email = req.user.email;
-    const { data } = req.body;
+    const { finalTree } = req.body;
 
     if (!email) {
       throw new ApiError(400, "Unauthorized access");
     }
 
-    if (!data) {
+    if (!finalTree) {
       throw new ApiError(400, "Data not provided");
     }
 
@@ -249,24 +247,52 @@ const updateFolder = asyncHandler(async (req, res) => {
       throw new ApiError(404, "User does not exist");
     }
 
-    user.userFileFolder = data;
+    user.userFileFolder = finalTree;
     await user.save();
 
     const updatedUserData = await User.findOne({ email });
 
-    return res.status(200).json(
-      new ApiResponse(
-        200,
-        {
-          userFileFolder: updatedUserData.userFileFolder,
-        },
-        "Successfully updated"
-      )
-    );
+    const fileExplore = updatedUserData.userFileFolder;
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, fileExplore, "Successfully updated"));
   } catch (error) {
     console.log(error);
     return res.status(500).json(new ApiError(500, "Internal Error"));
   }
 });
 
-export { registerUser, loginUser, logoutUser, getUser, updateFolder };
+const userFileExplorer = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if (!userId) {
+      throw new ApiError(400, "Unauthorized access");
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User does not exist");
+    }
+
+    const data = user.userFileFolder;
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, data, "Successfully fetched"));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiError(500, "Internal Error"));
+  }
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getUser,
+  updateFolder,
+  userFileExplorer,
+};

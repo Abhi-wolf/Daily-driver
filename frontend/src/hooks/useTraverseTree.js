@@ -22,7 +22,7 @@ const useTraverseTree = () => {
 
     // traverse all the children
     let latestNode = [];
-    latestNode = tree.items.map((obj) => {
+    latestNode = tree?.items?.map((obj) => {
       return insertNode(obj, folderId, item, isFolder);
     });
 
@@ -36,7 +36,7 @@ const useTraverseTree = () => {
     }
 
     let latestNode = [];
-    latestNode = tree.items.map((obj) => {
+    latestNode = tree?.items?.map((obj) => {
       return renameNode(obj, itemId, newName);
     });
 
@@ -47,7 +47,7 @@ const useTraverseTree = () => {
   function deleteNode(tree, itemId) {
     if (tree.id == itemId) return null;
 
-    const filteredItems = tree.items
+    const filteredItems = tree?.items
       .map((obj) => deleteNode(obj, itemId))
       .filter(Boolean);
 

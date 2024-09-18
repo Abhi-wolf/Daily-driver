@@ -13,6 +13,11 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  createdBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 export const Event = mongoose.model("Event", eventSchema);

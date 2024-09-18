@@ -1,39 +1,46 @@
 /* eslint-disable react/prop-types */
 import useTraverseTree from "@/hooks/useTraverseTree";
 import FolderOrFile from "./FolderOrFile";
-import { useSelector, useDispatch } from "react-redux";
 import ToolTip from "./ToolTip";
 import { Folder, NotebookPen } from "lucide-react";
 import { useState } from "react";
 import AddFileOrFolder from "./AddFolderOrFile";
-import { updateFolderData } from "../app/features/userSlice";
-import { useUpdateFolderMutation } from "../app/features/userApi";
+import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
+import { useUpdateFileExplorer } from "../hooks/fileExplorer/useUpdateFileExplorer";
 
 function Folderbar() {
+  // const explorerData = {};
+  const { data: explorerData, isPending } = useGetUserFileExplorer();
+  const { updateFileExplorer, isUpdating } = useUpdateFileExplorer();
+
+  console.log("explorerData = ", explorerData);
+
   const [newFolder, setNewFolder] = useState(false);
   const [newFile, setNewFile] = useState(false);
-  const explorerData = useSelector((state) => state.user.userFileFolder);
-  const dispatch = useDispatch();
-  const [updateFolder] = useUpdateFolderMutation();
   const { insertNode, renameNode, deleteNode } = useTraverseTree();
 
   const handleInsertNode = async (folderId, item, isFolder) => {
     const finalTree = insertNode(explorerData, folderId, item, isFolder);
-    const data = await updateFolder({ data: finalTree });
-    dispatch(updateFolderData(data?.data?.data?.userFileFolder));
+    updateFileExplorer({ finalTree });
+    console.log(finalTree);
   };
 
   const handleRenameNode = async (folderId, newName) => {
     const finalTree = renameNode(explorerData, folderId, newName);
-    const data = await updateFolder({ data: finalTree });
-    dispatch(updateFolderData(data?.data?.data?.userFileFolder));
+    updateFileExplorer({ finalTree });
+    console.log(finalTree);
   };
 
   const handleDeleteNode = async (folderId) => {
     const finalTree = deleteNode(explorerData, folderId);
-    const data = await updateFolder({ data: finalTree });
-    dispatch(updateFolderData(data?.data?.data?.userFileFolder));
+    updateFileExplorer({ finalTree });
+
+    console.log(finalTree);
   };
+
+  if (isPending || isUpdating) {
+    return <h1>Pending ..... </h1>;
+  }
 
   return (
     <div className="block w-[300px] min-h-full border-2 border-gray-400  ">

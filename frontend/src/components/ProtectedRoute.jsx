@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import { Navigate } from "react-router-dom";
-import { useSelector } from "react-redux"; // Assuming you store auth state in Redux
+import { useUserStore } from "../store";
 
 const ProtectedRoute = ({ children }) => {
-  const user = useSelector((state) => state.user.userName);
+  const { user } = useUserStore();
   console.log(user);
 
-  if (!user) {
+  if (!user?.email) {
     return <Navigate to="/login" replace />;
   }
 

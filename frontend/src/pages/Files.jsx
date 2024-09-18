@@ -1,10 +1,8 @@
-import { useSelector } from "react-redux";
 import Folderbar from "../components/Folderbar";
+import { useFileExplorerStore } from "../store";
 
 function Files() {
-  const fileToOpen = useSelector((state) => state.user.fileToOpen);
-
-  console.log(fileToOpen);
+  const { fileToOpen } = useFileExplorerStore();
 
   return (
     <section className="flex gap-1 min-h-full">

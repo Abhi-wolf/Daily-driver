@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { useDispatch } from "react-redux";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -15,13 +14,13 @@ import { Input } from "./ui/input";
 // import { Label } from "./ui/label";
 
 function AddOrEditTask({ isOpen, onClose, isFolder = true }) {
-  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const onSubmit = (item) => {
+    console.log(item);
     onClose(false);
   };
 

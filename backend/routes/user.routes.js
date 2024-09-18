@@ -6,6 +6,7 @@ import {
   registerUser,
   getUser,
   updateFolder,
+  userFileExplorer,
 } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -41,5 +42,6 @@ router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/currentUser").post(verifyJWT, getUser);
 router.route("/updateFolder").post(verifyJWT, updateFolder);
+router.route("/getUserFileExplorer").get(verifyJWT, userFileExplorer);
 
 export default router;

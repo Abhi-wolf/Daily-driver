@@ -1,7 +1,6 @@
 import {
   CalendarClock,
   CalendarDaysIcon,
-  CalendarMinus,
   HashIcon,
   PlusCircle,
 } from "lucide-react";

@@ -11,6 +11,7 @@ import {
 import {
   ChevronDown,
   ChevronRight,
+  File,
   FolderOpen,
   Pencil,
   Trash2,
@@ -18,7 +19,6 @@ import {
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Input } from "./ui/input";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
   Dialog,
@@ -28,7 +28,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { openFile } from "../app/features/userSlice";
+import { useFileExplorerStore } from "../store";
 
 function FolderOrFile({
   folder,
@@ -36,8 +36,8 @@ function FolderOrFile({
   handleRenameNode,
   handleDeleteNode,
 }) {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { setFileToOpen } = useFileExplorerStore();
   const [expand, setExpand] = useState(false);
   const [deleteFileFolder, setDeleteFileFolder] = useState(false);
 
@@ -160,14 +160,18 @@ function FolderOrFile({
             <div
               className="text-gray-500 font-semibold text-sm p-2 bg-gray-100 my-2 rounded-md cursor-pointer"
               onClick={() => {
-                dispatch(openFile(folder.id));
+                setFileToOpen(folder?.id);
                 navigate("/files");
               }}
             >
               {rename.visible ? (
                 <div className="flex gap-2 items-center">
                   <span>
-                    {showInput.isFolder && <ChevronRight className="w-4 h-4" />}
+                    {showInput.isFolder ? (
+                      <ChevronRight className="w-4 h-4" />
+                    ) : (
+                      <File className="w-4 h-4" />
+                    )}
                   </span>
                   <Input
                     type="text"
@@ -177,7 +181,10 @@ function FolderOrFile({
                   />
                 </div>
               ) : (
-                folder?.name
+                <div className="flex gap-2 items-center">
+                  <File className="w-4 h-4" />
+                  {folder?.name}
+                </div>
               )}
             </div>
           )}

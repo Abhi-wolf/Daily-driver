@@ -11,44 +11,42 @@ import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
-import { useLoginUserMutation } from "../app/features/userApi";
-import { useDispatch } from "react-redux";
-import { setUser } from "../app/features/userSlice";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { useLogin } from "../hooks/auth/useLogin";
+import { useUserStore } from "../store";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginUser, { isLoading }] = useLoginUserMutation();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm();
-
-  const dispatch = useDispatch();
+  const { login, isPending } = useLogin();
+  const { setUser } = useUserStore();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    try {
-      const user = await loginUser(data).unwrap();
-      dispatch(setUser(user?.data?.user));
-      toast.success("Login successfull");
-      navigate("/");
-    } catch (err) {
-      if (err?.data?.message) {
-        // Backend error message
-        toast.error(err.data.message);
-      } else if (err.status === "PARSING_ERROR") {
-        // Handle invalid JSON response
-        toast.error("Server returned an invalid response");
-      } else {
-        // Generic error
-        toast.error("An unexpected error occurred");
+    console.log(data);
+    login(
+      { data },
+      {
+        onSuccess: (data) => {
+          console.log("user = ", data);
+          if (data?.data?.user?.email) {
+            setUser(data?.data?.user);
+            toast.success("Login successfull", data?.data?.user?.email);
+            navigate("/");
+          }
+        },
+        onError: (err) => {
+          toast.error(err.message);
+          console.log(err.message);
+          navigate("/login");
+        },
       }
-      console.error("Error details: ", err);
-      navigate("/login");
-    }
+    );
   };
 
   return (
@@ -67,7 +65,7 @@ export function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                disabled={isLoading}
+                disabled={isPending}
                 placeholder="m@example.com"
                 {...register("email", { required: true })}
               />
@@ -92,7 +90,7 @@ export function LoginForm() {
                   type={`${showPassword ? "text" : "password"}`}
                   id="password"
                   className="w-full"
-                  disabled={isLoading}
+                  disabled={isPending}
                   {...register("password", { required: true })}
                 />
 
@@ -110,7 +108,7 @@ export function LoginForm() {
               )}
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full" disabled={isPending}>
             Login
           </Button>
           {/* <Button variant="outline" className="w-full">

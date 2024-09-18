@@ -11,15 +11,14 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { useUpdateFolderMutation } from "../app/features/userApi";
-import { updateFolderData } from "../app/features/userSlice";
+import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
+import { useUpdateFileExplorer } from "../hooks/fileExplorer/useUpdateFileExplorer";
 
 function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
-  const explorerData = useSelector((state) => state.user.userFileFolder);
-  const dispatch = useDispatch();
+  // const explorerData = [];
+  const { updateFileExplorer, isUpdating } = useUpdateFileExplorer();
+  const { data: explorerData, isPending } = useGetUserFileExplorer();
   const navigate = useNavigate();
-  const [updateFolder, { isLoading }] = useUpdateFolderMutation();
 
   const {
     register,
@@ -29,9 +28,8 @@ function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
   const onSubmit = async (item) => {
     try {
       const finalTree = insertNode(explorerData, "1", item.name, isFolder);
-      const data = await updateFolder({ data: finalTree });
-
-      dispatch(updateFolderData(data?.data?.data?.userFileFolder));
+      console.log(finalTree);
+      updateFileExplorer({ finalTree });
       onClose(false);
       navigate("/files");
     } catch (error) {
@@ -63,7 +61,7 @@ function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
             <Input
               id="name"
               className="col-span-3"
-              disabled={isLoading}
+              disabled={false}
               {...register("name", { required: true })}
             />
 
@@ -71,7 +69,7 @@ function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
               <span className="text-red-400 my-1">Name is required.</span>
             )}
           </div>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={false}>
             Save changes
           </Button>
         </form>

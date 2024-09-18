@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import userRouter from "./routes/user.routes.js";
+import eventRouter from "./routes/event.routes.js";
 
 const app = express();
 app.use(
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use(logger("dev"));
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/event", eventRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
