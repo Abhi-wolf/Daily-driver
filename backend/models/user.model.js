@@ -61,6 +61,19 @@ const userSchema = new mongoose.Schema(
         ref: "Event",
       },
     ],
+
+    // labels
+    labels: [
+      {
+        labelName: {
+          type: String,
+          required: [true, "Label name is required"],
+        },
+        labelColor: {
+          type: String,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

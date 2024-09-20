@@ -142,7 +142,6 @@ const loginUser = asyncHandler(async (req, res) => {
             email: existinguser.email,
             name: existinguser.name,
             profilePic: existinguser.profilePic,
-            userFileFolder: existinguser.userFileFolder,
           },
           // accessToken,
           // refreshToken,

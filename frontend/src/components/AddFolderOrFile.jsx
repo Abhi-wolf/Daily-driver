@@ -17,7 +17,7 @@ import { useUpdateFileExplorer } from "../hooks/fileExplorer/useUpdateFileExplor
 function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
   // const explorerData = [];
   const { updateFileExplorer, isUpdating } = useUpdateFileExplorer();
-  const { data: explorerData, isPending } = useGetUserFileExplorer();
+  const { data: explorerData } = useGetUserFileExplorer();
   const navigate = useNavigate();
 
   const {
@@ -61,7 +61,7 @@ function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
             <Input
               id="name"
               className="col-span-3"
-              disabled={false}
+              disabled={isUpdating}
               {...register("name", { required: true })}
             />
 

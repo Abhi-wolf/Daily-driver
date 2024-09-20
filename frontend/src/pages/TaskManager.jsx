@@ -1,11 +1,14 @@
-import TaskManagerSideBar from "../components/TaskManagerSideBar";
+import { Outlet } from "react-router";
+import TaskManagerSideBar from "../components/TaskManagerComponents/TaskManagerSideBar";
 
 function TaskManager() {
   return (
-    <section className="flex gap-1 min-h-full">
+    <>
       <TaskManagerSideBar />
-      <div>Task Manager</div>
-    </section>
+      <div className="w-full overflow-y-auto overflow-x-hidden">
+        <Outlet />
+      </div>
+    </>
   );
 }
 

@@ -56,7 +56,7 @@ function Topbar() {
   };
 
   return (
-    <header className="w-full border-[1px] border-gray-300">
+    <header className="w-full border-[1px] border-gray-300 fixed top-0 left-0">
       <div className="p-2 flex justify-between items-center ">
         {/* left */}
         <div className="flex gap-4 items-center">

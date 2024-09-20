@@ -5,13 +5,13 @@ function Files() {
   const { fileToOpen } = useFileExplorerStore();
 
   return (
-    <section className="flex gap-1 min-h-full">
+    <>
       <Folderbar />
-      <div>
+      <div className="w-full overflow-y-auto overflow-x-hidden">
         {fileToOpen}
         Dashboard
       </div>
-    </section>
+    </>
   );
 }
 

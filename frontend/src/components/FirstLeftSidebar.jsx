@@ -2,12 +2,14 @@
 "use client";
 
 import {
+  BadgeIndianRupee,
   BookCheck,
   CalendarDays,
   Command,
   FolderPlus,
   PencilLineIcon,
   Settings,
+  Vault,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -42,17 +44,10 @@ function FirstLeftSidebar() {
                 <CalendarDays className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
-            {/* {/* <li
-              className="list-none cursor-pointer"
-              onClick={() => setNewFile(!newFile)}
-            >
-              <ToolTip text="New Note">
-                <NotebookPen className="h-5 w-5 hover:text-gray-400 transition" />
-              </ToolTip>
-            </li> */}
+
             <li
               className="list-none cursor-pointer"
-              onClick={() => navigate("/tasks")}
+              onClick={() => navigate("/tasksmanager")}
             >
               <ToolTip text="Task Manager">
                 <BookCheck className="h-5 w-5 hover:text-gray-400 transition" />
@@ -64,6 +59,18 @@ function FirstLeftSidebar() {
             >
               <ToolTip text="New Task">
                 <PencilLineIcon className="h-5 w-5 hover:text-gray-400 transition" />
+              </ToolTip>
+            </li>
+
+            <li className="list-none cursor-pointer">
+              <ToolTip text="Spendings & Savings">
+                <BadgeIndianRupee className="h-5 w-5 hover:text-gray-400 transition" />
+              </ToolTip>
+            </li>
+
+            <li className="list-none cursor-pointer">
+              <ToolTip text="Debt & Lendings">
+                <Vault className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
           </div>

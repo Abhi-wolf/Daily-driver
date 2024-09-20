@@ -3,9 +3,10 @@ import Home from "./pages/Home";
 import Layout from "./Layout";
 import Profile from "./pages/Profile";
 import Files from "./pages/Files";
-import TaskManager from "./pages/TaskManager";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import TaskManager from "./pages/TaskManager";
+import { KanbanBoard } from "./components/TaskManagerComponents/KanbanBoard";
 
 function App() {
   return (
@@ -22,7 +23,12 @@ function App() {
         >
           <Route index path="/files" element={<Files />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/tasks" element={<TaskManager />} />
+          <Route path="/tasksmanager" element={<TaskManager />}>
+            <Route
+              path="/tasksmanager/project/:projectId"
+              element={<KanbanBoard />}
+            />
+          </Route>
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

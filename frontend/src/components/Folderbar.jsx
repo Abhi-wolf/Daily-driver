@@ -43,7 +43,7 @@ function Folderbar() {
   }
 
   return (
-    <div className="block w-[300px] min-h-full border-2 border-gray-400  ">
+    <div className="block w-[300px] min-h-full border-2 border-gray-400 rounded-r-3xl ">
       <div className="w-full  py-4 flex flex-col gap-4">
         <h3 className="text-center text-violet-500 font-bold text-lg underline decoration-wavy py-2">
           Files And Folders

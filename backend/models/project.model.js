@@ -8,6 +8,7 @@ const projectSchema = new mongoose.Schema(
     },
     projectDescription: {
       type: String,
+      default: "",
     },
     projectTasks: [
       {
@@ -21,12 +22,18 @@ const projectSchema = new mongoose.Schema(
         taskStatus: {
           type: String,
           default: "todo",
+          required: [true, "Task status is required"],
           enum: {
-            values: ["todo", "in-progress", "completed"],
+            values: ["backlog", "todo", "doing", "done"],
           },
         },
       },
     ],
+    createdBy: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,

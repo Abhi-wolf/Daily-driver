@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import userRouter from "./routes/user.routes.js";
 import eventRouter from "./routes/event.routes.js";
+import projectRouter from "./routes/project.routes.js";
+import labelRouter from "./routes/label.routes.js";
 
 const app = express();
 app.use(
@@ -23,6 +25,8 @@ app.use(logger("dev"));
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/event", eventRouter);
+app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/label", labelRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
