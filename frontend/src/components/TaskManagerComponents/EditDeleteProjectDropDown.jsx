@@ -18,10 +18,13 @@ import { useState } from "react";
 import { useDeleteProject } from "../../hooks/project/useDeleteProject";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import AddOrEditProjectModel from "./AddOrEditProjectModel";
+import { useGetProject } from "../../hooks/project/useGetProject";
 
 function EditDeleteProjectDropDown({ projectId }) {
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
   const { deleteProject, isPending } = useDeleteProject();
+  const { project } = useGetProject();
   const navigate = useNavigate();
 
   const handleDeleteProject = async () => {
@@ -56,7 +59,13 @@ function EditDeleteProjectDropDown({ projectId }) {
         >
           Delete Project
         </Button>
-        <Button variant="outline"> Edit Project</Button>
+        {/* <Button variant="outline"> Edit Project</Button> */}
+        <AddOrEditProjectModel
+          mode="edit"
+          projectId={projectId}
+          projectDescription={project?.projectDescription}
+          projectName={project?.projectName}
+        />
       </DropdownMenuContent>
 
       {confirmDeleteDialog && (

@@ -12,14 +12,15 @@ const projectSchema = new mongoose.Schema(
     },
     projectTasks: [
       {
-        taskName: {
+        _id: {
+          type: String,
+          required: true,
+        },
+        title: {
           type: String,
           required: [true, "Task name is required"],
         },
-        taskDescription: {
-          type: String,
-        },
-        taskStatus: {
+        column: {
           type: String,
           default: "todo",
           required: [true, "Task status is required"],

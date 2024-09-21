@@ -9,14 +9,14 @@ import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
 import { useGetProject } from "../../hooks/project/useGetProject";
 import { LargeSpinner } from "../../components/Spinners";
+import { useUpdateProjectTasks } from "../../hooks/project/useUpdateProjectTasks";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 
 export const KanbanBoard = () => {
-  const { projectId } = useParams();
-  console.log(projectId);
-
   const { project, isPending } = useGetProject();
 
-  console.log(project);
+  console.log("PROJECT = ", project);
 
   return (
     <div className=" w-full bg-white text-gray-500 h-full  md:p-4">
@@ -28,15 +28,15 @@ export const KanbanBoard = () => {
             Project :{" "}
             <span className="text-green-400">{project?.projectName}</span>
           </h1>
-          <Board />
+          <Board projectTasks={project?.projectTasks} />
         </>
       )}
     </div>
   );
 };
 
-const Board = () => {
-  const [cards, setCards] = useState(DEFAULT_CARDS);
+const Board = ({ projectTasks }) => {
+  const [cards, setCards] = useState(projectTasks);
 
   return (
     <div className="flex h-full w-full gap-1 p-1 md:p-4 justify-around flex-wrap">
@@ -69,16 +69,18 @@ const Board = () => {
         setCards={setCards}
       />
 
-      <BurnBarrel setCards={setCards} />
+      <BurnBarrel setCards={setCards} cards={cards} />
     </div>
   );
 };
 
 const Column = ({ title, headingColor, cards, column, setCards }) => {
   const [active, setActive] = useState(false);
+  const { projectId } = useParams();
+  const { updateProjectTasks, isPending } = useUpdateProjectTasks();
 
   const handleDragStart = (e, card) => {
-    e.dataTransfer.setData("cardId", card.id);
+    e.dataTransfer.setData("cardId", card._id);
   };
 
   const handleDragEnd = (e) => {
@@ -93,26 +95,34 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
     const before = element.dataset.before || "-1";
 
     if (before !== cardId) {
-      let copy = [...cards];
+      let projectTasks = [...cards];
 
-      let cardToTransfer = copy.find((c) => c.id === cardId);
+      let cardToTransfer = projectTasks.find((c) => c._id === cardId);
       if (!cardToTransfer) return;
       cardToTransfer = { ...cardToTransfer, column };
 
-      copy = copy.filter((c) => c.id !== cardId);
+      projectTasks = projectTasks.filter((c) => c._id !== cardId);
 
       const moveToBack = before === "-1";
 
       if (moveToBack) {
-        copy.push(cardToTransfer);
+        projectTasks.push(cardToTransfer);
       } else {
-        const insertAtIndex = copy.findIndex((el) => el.id === before);
+        const insertAtIndex = projectTasks.findIndex((el) => el._id === before);
         if (insertAtIndex === undefined) return;
 
-        copy.splice(insertAtIndex, 0, cardToTransfer);
+        projectTasks.splice(insertAtIndex, 0, cardToTransfer);
       }
 
-      setCards(copy);
+      updateProjectTasks(
+        { projectId, projectTasks },
+        {
+          onSuccess: () => {
+            toast.success("Task successfully updated");
+          },
+        }
+      );
+      setCards(projectTasks);
     }
   };
 
@@ -188,29 +198,30 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
         onDrop={handleDragEnd}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        aria-disabled={isPending}
         className={`h-full w-full transition-colors ${
           active ? "bg-neutral-800/50" : "bg-neutral-800/0"
         }`}
       >
         {filteredCards.map((c) => {
-          return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+          return <Card key={c._id} {...c} handleDragStart={handleDragStart} />;
         })}
         <DropIndicator beforeId={null} column={column} />
-        <AddCard column={column} setCards={setCards} />
+        <AddCard column={column} setCards={setCards} cards={cards} />
       </div>
     </div>
   );
 };
 
-const Card = ({ title, id, column, handleDragStart }) => {
+const Card = ({ title, _id, column, handleDragStart }) => {
   return (
     <>
-      <DropIndicator beforeId={id} column={column} />
+      <DropIndicator beforeId={_id} column={column} />
       <motion.div
         layout
-        layoutId={id}
+        layoutId={_id}
         draggable="true"
-        onDragStart={(e) => handleDragStart(e, { title, id, column })}
+        onDragStart={(e) => handleDragStart(e, { title, _id, column })}
         className="cursor-grab rounded border border-neutral-700 bg-neutral-300 p-3 active:cursor-grabbing"
       >
         <p className="text-md text-neutral-900">{title}</p>
@@ -224,13 +235,15 @@ const DropIndicator = ({ beforeId, column }) => {
     <div
       data-before={beforeId || "-1"}
       data-column={column}
-      className="my-0.5 h-0.5 w-full bg-violet-400 opacity-0"
+      className="my-0.5 h-0.5 w-full bg-violet-300 opacity-0 text-gray-400"
     />
   );
 };
 
-const BurnBarrel = ({ setCards }) => {
+const BurnBarrel = ({ setCards, cards }) => {
   const [active, setActive] = useState(false);
+  const { projectId } = useParams();
+  const { updateProjectTasks, isPending } = useUpdateProjectTasks();
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -244,7 +257,18 @@ const BurnBarrel = ({ setCards }) => {
   const handleDragEnd = (e) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    setCards((pv) => pv.filter((c) => c.id !== cardId));
+    const projectTasks = cards.filter((card) => card._id !== cardId);
+    console.log("DELETE CARD = ", projectTasks);
+
+    updateProjectTasks(
+      { projectId, projectTasks },
+      {
+        onSuccess: () => {
+          toast.success("Task successfully deleted");
+        },
+      }
+    );
+    setCards(projectTasks);
 
     setActive(false);
   };
@@ -254,6 +278,7 @@ const BurnBarrel = ({ setCards }) => {
       onDrop={handleDragEnd}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
+      aria-disabled={isPending}
       className={`mt-10 grid h-56 w-56 shrink-0 place-content-center rounded border text-3xl ${
         active
           ? "border-red-800 bg-red-800/20 text-red-500"
@@ -265,9 +290,11 @@ const BurnBarrel = ({ setCards }) => {
   );
 };
 
-const AddCard = ({ column, setCards }) => {
+const AddCard = ({ column, setCards, cards }) => {
   const [text, setText] = useState("");
   const [adding, setAdding] = useState(false);
+  const { projectId } = useParams();
+  const { updateProjectTasks, isPending } = useUpdateProjectTasks();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -277,11 +304,22 @@ const AddCard = ({ column, setCards }) => {
     const newCard = {
       column,
       title: text.trim(),
-      id: Math.random().toString(),
+      _id: uuidv4(),
     };
 
-    setCards((pv) => [...pv, newCard]);
+    const projectTasks = [...cards, newCard];
+    console.log("ADD CARD = ", projectTasks);
 
+    setCards(projectTasks);
+
+    updateProjectTasks(
+      { projectId, projectTasks },
+      {
+        onSuccess: () => {
+          toast.success("Task successfully added");
+        },
+      }
+    );
     setAdding(false);
   };
 
@@ -292,12 +330,15 @@ const AddCard = ({ column, setCards }) => {
           <Textarea
             onChange={(e) => setText(e.target.value)}
             autoFocus
+            rows={6}
+            disabled={isPending}
             placeholder="Add new task..."
-            className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-50 placeholder-violet-300 focus:outline-0"
+            className="w-full  rounded border border-violet-300 bg-gray-100 p-3 text-sm text-gray-500 placeholder-violet-300 focus:outline-0 font-semibold"
           />
           <div className="mt-1.5 flex items-center justify-end gap-1.5">
             <Button
               size="sm"
+              disabled={isPending}
               onClick={() => setAdding(false)}
               //   className="px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50"
             >
@@ -306,6 +347,7 @@ const AddCard = ({ column, setCards }) => {
             <Button
               type="submit"
               size="sm"
+              disabled={isPending}
               //   className="flex items-center gap-1.5 rounded bg-neutral-50 px-3 py-1.5 text-xs text-neutral-950 transition-colors hover:bg-neutral-300"
             >
               <span>Add</span>
@@ -326,36 +368,3 @@ const AddCard = ({ column, setCards }) => {
     </>
   );
 };
-
-const DEFAULT_CARDS = [];
-
-// const DEFAULT_CARDS = [
-//   // BACKLOG
-//   { title: "Look into render bug in dashboard", id: "1", column: "backlog" },
-//   { title: "SOX compliance checklist", id: "2", column: "backlog" },
-//   { title: "[SPIKE] Migrate to Azure", id: "3", column: "backlog" },
-//   { title: "Document Notifications service", id: "4", column: "backlog" },
-
-//   // TODO
-//   {
-//     title: "Research DB options for new microservice",
-//     id: "5",
-//     column: "todo",
-//   },
-//   { title: "Postmortem for outage", id: "6", column: "todo" },
-//   { title: "Sync with product on Q3 roadmap", id: "7", column: "todo" },
-
-//   // DOING
-//   {
-//     title: "Refactor context providers to use Zustand",
-//     id: "8",
-//     column: "doing",
-//   },
-//   { title: "Add logging to daily CRON", id: "9", column: "doing" },
-//   // DONE
-//   {
-//     title: "Set up DD dashboards for Lambda listener",
-//     id: "10",
-//     column: "done",
-//   },
-// ];

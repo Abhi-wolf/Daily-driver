@@ -6,12 +6,12 @@ import {
 } from "lucide-react";
 import { useProjectStore } from "../../store";
 import { useNavigate, useParams } from "react-router";
-import AddProjectModel from "./AddProjectModel";
 import { useGetProjects } from "../../hooks/project/useGetProjects";
 import { SmallSpinner } from "../Spinners";
 import { useGetLabels } from "../../hooks/labels/useGetLabels";
 import AddLabelModel from "./AddLabelModel";
 import EditDeleteProjectDropDown from "./EditDeleteProjectDropDown";
+import AddOrEditProjectModel from "./AddOrEditProjectModel";
 
 function TaskManagerSideBar() {
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ function TaskManagerSideBar() {
                 </li>
               ))}
 
-              <AddProjectModel />
+              <AddOrEditProjectModel />
             </ul>
           )}
         </div>

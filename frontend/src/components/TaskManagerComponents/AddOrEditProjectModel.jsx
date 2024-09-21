@@ -18,7 +18,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useAddProject } from "../../hooks/project/useAddProject";
 
-function AddProjectModel() {
+function AddOrEditProjectModel({
+  mode = "create",
+  projectName = "",
+  projectDescription = "",
+  projectId = "",
+}) {
   const { addNewProject, isPending } = useAddProject();
   const [isOpen, onClose] = useState(false);
   const {
@@ -28,6 +33,10 @@ function AddProjectModel() {
   } = useForm();
 
   const onSubmit = async (newProject) => {
+    if (projectId) {
+      newProject = { ...newProject, projectId: projectId };
+    }
+
     try {
       addNewProject(
         { newProject },
@@ -47,14 +56,20 @@ function AddProjectModel() {
   return (
     <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={false}>
       <DialogTrigger asChild>
-        <li className="list-none flex gap-4 items-center text-orange-400 font-semibold cursor-pointer hover:text-orange-700">
-          <PlusCircle className="h-5 w-5" />{" "}
-          <span className="text-md">Create new Project</span>
-        </li>
+        {mode === "create" ? (
+          <li className="list-none flex gap-4 items-center text-orange-400 font-semibold cursor-pointer hover:text-orange-700">
+            <PlusCircle className="h-5 w-5" />{" "}
+            <span className="text-md">Create a new Project</span>
+          </li>
+        ) : (
+          <Button variant="outline">Edit Project</Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-8 text-gray-600">
         <DialogHeader>
-          <DialogTitle>Create A New Project</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Create a new Project" : "Edit project"}
+          </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <form
@@ -68,6 +83,7 @@ function AddProjectModel() {
             <Input
               id="projectName"
               className="col-span-3"
+              defaultValue={projectName}
               disabled={isPending}
               {...register("projectName", { required: true })}
             />
@@ -86,6 +102,7 @@ function AddProjectModel() {
             </Label>
             <Textarea
               id="projectDescription"
+              defaultValue={projectDescription}
               className="col-span-3"
               disabled={isPending}
               {...register("projectDescription")}
@@ -96,7 +113,7 @@ function AddProjectModel() {
             )}
           </div>
           <Button type="submit" disabled={isPending}>
-            Create Project
+            {mode === "create" ? "Create Project" : "Save Changes"}
           </Button>
         </form>
       </DialogContent>
@@ -104,4 +121,4 @@ function AddProjectModel() {
   );
 }
 
-export default AddProjectModel;
+export default AddOrEditProjectModel;

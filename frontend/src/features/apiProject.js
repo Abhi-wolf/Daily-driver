@@ -61,7 +61,7 @@ export async function addNewProject({ newProject }) {
 }
 
 export async function getProject({ projectId }) {
-  console.log("projectId = ", projectId);
+  // console.log("projectId = ", projectId);
 
   try {
     const res = await fetch(`${apiURL}/project/${projectId}`, {
@@ -77,7 +77,7 @@ export async function getProject({ projectId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project data = ", data);
+    // console.log("project data = ", data);
     return data?.data;
   } catch (err) {
     console.log(err);
@@ -94,7 +94,7 @@ export async function deleteProject({ projectId }) {
 
   try {
     const res = await fetch(`${apiURL}/project/${projectId}`, {
-      method: "POST",
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
@@ -107,6 +107,37 @@ export async function deleteProject({ projectId }) {
     }
     const data = await res.json();
     console.log("project data delete = ", data);
+    return projectId;
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.error(err.response.data.message);
+      throw new Error(err.response.data.message);
+    }
+    throw new Error(err);
+  }
+}
+
+export async function updateProjectTasks({ projectId, projectTasks }) {
+  console.log("projectId = ", projectId);
+  console.log("projectTasks = ", projectTasks);
+
+  try {
+    const res = await fetch(`${apiURL}/project/${projectId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ projectTasks }), // here projectTasks is an array
+      credentials: "include", // Sends cookies and credentials with the request
+    });
+    // Check if the response is okay (status 200-299)
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+    const data = await res.json();
+    console.log("project task update = ", data);
     return data?.data;
   } catch (err) {
     console.log(err);

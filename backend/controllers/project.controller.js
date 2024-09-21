@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
 const addProject = asyncHandler(async (req, res) => {
-  const { projectName, projectDescription, projectTasks } = req.body;
+  const { projectId, projectName, projectDescription, projectTasks } = req.body;
 
   if (!projectName) {
     throw new ApiError(400, "All fields are required");
@@ -24,15 +24,23 @@ const addProject = asyncHandler(async (req, res) => {
   }
 
   try {
-    const project = await Project.create({
-      projectName,
-      projectDescription,
-      projectTasks,
-      createdBy: userId,
-    });
+    let project;
+    if (projectId) {
+      project = await Project.findByIdAndUpdate(projectId, {
+        projectName,
+        projectDescription,
+      });
+    } else {
+      project = await Project.create({
+        projectName,
+        projectDescription,
+        projectTasks,
+        createdBy: userId,
+      });
 
-    user.projects.push(project._id);
-    await user.save();
+      user.projects.push(project._id);
+      await user.save();
+    }
 
     return res
       .status(200)
@@ -68,7 +76,7 @@ const getProjects = asyncHandler(async (req, res) => {
 const getProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  if (!projectId) {
+  if (!projectId || projectId === "undefined") {
     throw new ApiError(400, "Project Id not present");
   }
 
@@ -86,15 +94,12 @@ const getProject = asyncHandler(async (req, res) => {
 const deleteProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  console.log("delte id = ", projectId);
-
   if (!projectId) {
     throw new ApiError(400, "Project Id not present");
   }
 
   try {
     const project = await Project.findById(projectId);
-    console.log("delte project id= ", project);
 
     if (!project) {
       throw new ApiError(404, "Project not found");
@@ -117,4 +122,49 @@ const deleteProject = asyncHandler(async (req, res) => {
   }
 });
 
-export { addProject, getProjects, getProject, deleteProject };
+const updateProjectTasks = asyncHandler(async (req, res) => {
+  const { projectTasks } = req.body;
+  const { projectId } = req.params;
+
+  if (!projectId) {
+    throw new ApiError(400, "Project id is required");
+  }
+
+  const userId = req.user._id;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  if (!project.createdBy.equals(userId)) {
+    throw new ApiError(403, "Unauthorized access");
+  }
+
+  try {
+    project.projectTasks = projectTasks;
+    await project.save();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          project?.projectTasks,
+          "Project tasks successfully updated"
+        )
+      );
+  } catch (error) {
+    console.log("ERROR = ", error);
+    return res.status(500).json(new ApiError(500, "Internal error"));
+  }
+});
+
+export {
+  addProject,
+  getProjects,
+  getProject,
+  deleteProject,
+  updateProjectTasks,
+};

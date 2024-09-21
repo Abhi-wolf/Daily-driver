@@ -6,7 +6,9 @@ export function useDeleteProject() {
 
   const { mutate: deleteProject, isPending } = useMutation({
     mutationFn: deleteProjectApi,
-    onSuccess: () => {
+    onSuccess: (projectId) => {
+      console.log("Deleted project ID:", projectId);
+      queryClient.removeQueries(["project", projectId]);
       queryClient.invalidateQueries(["projects"]);
     },
   });
