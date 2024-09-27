@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   CalendarClock,
   CalendarDaysIcon,
@@ -5,13 +6,17 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { useProjectStore } from "../../store";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useGetProjects } from "../../hooks/project/useGetProjects";
 import { SmallSpinner } from "../Spinners";
 import { useGetLabels } from "../../hooks/labels/useGetLabels";
 import AddLabelModel from "./AddLabelModel";
 import EditDeleteProjectDropDown from "./EditDeleteProjectDropDown";
 import AddOrEditProjectModel from "./AddOrEditProjectModel";
+import EditOrDeleteLabelDropDown from "./EditOrDeleteLabelDropDown";
+import AddOrEditTask from "../AddOrEditTask";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 function TaskManagerSideBar() {
   const navigate = useNavigate();
@@ -19,24 +24,59 @@ function TaskManagerSideBar() {
   const { setprojectToOpen } = useProjectStore();
   const { projects, isPending: isGettingProjects } = useGetProjects();
   const { labels, isPending: isGettingLabels } = useGetLabels();
+  const [addNewTaskModal, setAddNewTaskModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  function handleChangeFilter(value) {
+    if (location.pathname === "/tasksmanager/todos") {
+      console.log(location.pathname);
+      setSearchParams({ filter: value });
+    } else {
+      navigate(`/tasksmanager/todos?filter=${value}`);
+    }
+  }
 
   return (
-    <div className="block w-[300px] min-h-full border-2 border-gray-400  p-4 pt-8 rounded-r-3xl overscroll-y-scroll">
-      <div className="flex flex-col gap-16 h-full overflow-y-auto">
+    <div className="block w-[300px] min-h-full border-2 border-gray-400  p-4 pt-8 rounded-r-3xl overflow-y-auto">
+      <div className="flex flex-col gap-10 h-full overflow-y-auto">
         {/* Upper Part */}
-        <ul className="flex flex-col gap-4">
-          <li className="list-none flex gap-4 items-center text-orange-500 font-semibold">
+        <ul className="flex flex-col   ">
+          <li
+            onClick={() => setAddNewTaskModal(true)}
+            className="list-none flex gap-4 items-center text-orange-500 font-semibold cursor-pointer hover:bg-orange-200 p-2 rounded-3xl"
+          >
             <PlusCircle className="h-6 w-6" />{" "}
             <span className="text-lg">Add Task</span>
           </li>
-          <li className="list-none flex gap-4 items-center ">
+          <li
+            onClick={() => handleChangeFilter("today")}
+            className="list-none flex gap-4 items-center cursor-pointer hover:bg-orange-200 p-2 rounded-3xl"
+          >
             <CalendarClock className="h-5 w-5" />{" "}
             <span className="text-lg">Today</span>
           </li>
-          <li className="list-none flex gap-4 items-center ">
+          <li
+            onClick={() => handleChangeFilter("this-week")}
+            className="list-none flex gap-4 items-center cursor-pointer hover:bg-orange-200 p-2 rounded-3xl"
+          >
             <CalendarDaysIcon className="h-5 w-5" />{" "}
-            <span className="text-lg">Upcoming</span>
+            <span className="text-lg">This week</span>
           </li>
+          <li
+            onClick={() => handleChangeFilter("next-week")}
+            className="list-none flex gap-4 items-center cursor-pointer hover:bg-orange-200 p-2 rounded-3xl"
+          >
+            <CalendarDaysIcon className="h-5 w-5" />{" "}
+            <span className="text-lg">Next Week</span>
+          </li>
+
+          {addNewTaskModal && (
+            <AddOrEditTask
+              isOpen={addNewTaskModal}
+              onClose={setAddNewTaskModal}
+            />
+          )}
         </ul>
 
         {/* labels */}
@@ -45,14 +85,17 @@ function TaskManagerSideBar() {
           {isGettingLabels ? (
             <SmallSpinner />
           ) : (
-            <ul className="flex flex-col gap-4 text-gray-500">
+            <ul className="flex flex-col gap-2 text-gray-500">
               {labels?.map((label) => (
                 <li
                   key={label._id}
-                  className="flex gap-4 cursor-pointer hover:text-gray-600 hover:font-semibold"
+                  className="flex gap-4 justify-between  hover:text-gray-600 hover:font-semibold"
                 >
-                  <HashIcon className="h-5 w-5 text-purple-500" />{" "}
-                  <span>{label.labelName}</span>
+                  <div className="flex gap-4">
+                    <HashIcon className="h-5 w-5 text-purple-500" />{" "}
+                    <span>{label.labelName}</span>
+                  </div>
+                  <EditOrDeleteLabelDropDown labelId={label._id} />
                 </li>
               ))}
 
@@ -67,7 +110,7 @@ function TaskManagerSideBar() {
           {isGettingProjects ? (
             <SmallSpinner />
           ) : (
-            <ul className="flex flex-col gap-4 text-gray-500 ">
+            <ul className="flex flex-col gap-2 text-gray-500 ">
               {projects?.map((project) => (
                 <li
                   key={project._id}

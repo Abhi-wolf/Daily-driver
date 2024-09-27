@@ -15,6 +15,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useLogin } from "../hooks/auth/useLogin";
 import { useUserStore } from "../store";
+import { Link } from "react-router-dom";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,9 +35,9 @@ export function LoginForm() {
       {
         onSuccess: (data) => {
           console.log("user = ", data);
-          if (data?.data?.user?.email) {
-            setUser(data?.data?.user);
-            toast.success("Login successfull", data?.data?.user?.email);
+          if (data?.user?.email) {
+            setUser(data?.user);
+            toast.success("Login successfull", data?.user?.email);
             navigate("/");
           }
         },
@@ -80,9 +81,12 @@ export function LoginForm() {
           <div className="grid gap-2">
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
-              <a href="#" className="ml-auto inline-block text-sm underline">
+              <Link
+                to="/forgotpassword"
+                className="ml-auto inline-block text-sm underline"
+              >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
             <div>
               <div className="flex relative ">
@@ -117,9 +121,9 @@ export function LoginForm() {
         </form>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <a href="#" className="underline">
+          <Link to="/signup" className="underline">
             Sign up
-          </a>
+          </Link>
         </div>
       </CardContent>
     </Card>

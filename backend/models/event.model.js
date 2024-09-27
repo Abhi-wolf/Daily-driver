@@ -9,7 +9,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  eventDate: {
+  startDate: {
+    type: Date,
+    default: Date.now(),
+  },
+  endDate: {
     type: Date,
     default: Date.now(),
   },

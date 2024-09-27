@@ -8,8 +8,10 @@ export function useDeleteProject() {
     mutationFn: deleteProjectApi,
     onSuccess: (projectId) => {
       console.log("Deleted project ID:", projectId);
-      queryClient.removeQueries(["project", projectId]);
-      queryClient.invalidateQueries(["projects"]);
+      if (projectId) {
+        queryClient.removeQueries({ queryKey: ["project", projectId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 

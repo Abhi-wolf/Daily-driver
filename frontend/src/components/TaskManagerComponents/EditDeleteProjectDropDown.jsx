@@ -40,9 +40,11 @@ function EditDeleteProjectDropDown({ projectId }) {
         },
         onError: (error) => {
           console.log(error);
+          toast.error(error?.message);
         },
       }
     );
+    setConfirmDeleteDialog(false);
   };
 
   return (

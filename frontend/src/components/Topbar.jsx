@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import { Bell, Bookmark, CalendarDaysIcon } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,39 +8,33 @@ import {
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+
 import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useForm } from "react-hook-form";
-import { transformDate } from "../lib/utils";
 import { toast } from "sonner";
 import { useUserStore } from "../store";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useGetEvent } from "../hooks/events/useGetEvents";
-import { useAddEvent } from "../hooks/events/useAddEvent";
+import { useNavigate } from "react-router";
+import AddEventDialog from "./EventDialog";
+import TodaysDate from "./TodaysDate";
 
 function Topbar() {
   const [selected, setSelected] = useState();
   const [isOpen, onClose] = useState(false);
   const { removeUser } = useUserStore();
   const { logout, isPending } = useLogout();
+  const navigate = useNavigate();
 
   const { events } = useGetEvent();
 
-  let eventDays = events?.map((event) => new Date(event.eventDate));
+  let eventDays = events?.map((event) => ({
+    from: new Date(event.startDate),
+    to: new Date(event.endDate),
+  }));
 
   const handleSelectDate = (date) => {
     setSelected(date);
-    console.log(date);
     onClose(!isOpen);
   };
 
@@ -65,6 +58,9 @@ function Topbar() {
           </li>
         </div>
 
+        {/* today's date */}
+        <TodaysDate />
+
         {/* right */}
         <div className="flex gap-4 items-center">
           <div>
@@ -74,9 +70,9 @@ function Topbar() {
             <DropdownMenuTrigger asChild>
               <CalendarDaysIcon className=" h-5 w-5 hover:text-gray-400 transition cursor-pointer" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-6 mr-4">
+            <DropdownMenuContent className="p-6 mr-4 flex flex-col gap-4">
               <DayPicker
-                mode="single"
+                mode="range"
                 selected={selected}
                 onSelect={handleSelectDate}
                 modifiers={{
@@ -86,9 +82,16 @@ function Topbar() {
                   booked: "bg-red-500 text-white rounded-full",
                 }}
               />
+
+              <Button onClick={() => setSelected()} variant="secondary">
+                Clear Selected Dates
+              </Button>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Avatar className="h-6 w-6 cursor-not-allowed">
+          <Avatar
+            className="h-6 w-6 cursor-pointer"
+            onClick={() => navigate("/profile")}
+          >
             <AvatarImage src="" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
@@ -113,125 +116,6 @@ function Topbar() {
         />
       )}
     </header>
-  );
-}
-
-function AddEventDialog({ isOpen, onClose, selected, setSelected }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const { addEvent, isPending } = useAddEvent();
-
-  const onSubmit = async (data) => {
-    setSelected("");
-
-    const newEvent = {
-      eventName: data?.eventName,
-      eventDescription: data?.eventDescription,
-      eventDate: data.eventDate,
-      id: uuidv4(),
-    };
-
-    try {
-      addEvent(
-        { newEvent },
-        {
-          onSuccess: (data) => {
-            console.log("eveny data = ", data);
-            toast.success("Event Added successfully");
-          },
-          onError: (err) => {
-            toast.error(err.message);
-            console.log(err.message);
-          },
-        }
-      );
-    } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong.");
-    }
-
-    onClose(!isOpen);
-  };
-
-  return (
-    <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={false}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add Event</DialogTitle>
-          <DialogDescription>
-            Add important event&apos;s to get notifications on time.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
-          <div className="flex flex-col   gap-4">
-            <Label htmlFor="eventName" className="text-left">
-              Event Name
-            </Label>
-            <Input
-              id="eventName"
-              className="col-span-3"
-              {...register("eventName", { required: true })}
-              aria-invalid={errors.eventName ? "true" : "false"}
-            />
-
-            {errors.eventName && (
-              <p className="text-red-400 text-sm">Event name is required</p>
-            )}
-          </div>
-          <div className="flex flex-col   gap-4">
-            <Label htmlFor="eventDescription" className="text-left">
-              Event Description
-            </Label>
-            <Textarea
-              placeholder="Type your event description here."
-              id="eventDescription"
-              className="col-span-3"
-              {...register("eventDescription")}
-            />
-          </div>
-          <div className="flex flex-col   gap-4">
-            <Label htmlFor="eventDate" className="text-left">
-              From
-            </Label>
-            <Input
-              id="eventDate"
-              type="date"
-              defaultValue={transformDate(selected)}
-              className="col-span-3"
-              {...register("eventDate", {
-                required: true,
-                validate: (match) => {
-                  return (
-                    transformDate(new Date()) <= transformDate(match) ||
-                    "Date should be greater than or equal to today's date"
-                  );
-                },
-              })}
-              aria-invalid={errors.eventDate ? "true" : "false"}
-            />
-            {errors.eventDate && (
-              <p className="text-red-400 text-sm">
-                {errors.eventDate?.message
-                  ? errors.eventDate?.message
-                  : "Date is required"}
-              </p>
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            className="justify-self-end"
-            disabled={isPending}
-          >
-            Save changes
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
 

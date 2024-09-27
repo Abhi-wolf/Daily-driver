@@ -7,6 +7,8 @@ import {
   getUser,
   updateFolder,
   userFileExplorer,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -43,5 +45,7 @@ router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/currentUser").post(verifyJWT, getUser);
 router.route("/updateFolder").post(verifyJWT, updateFolder);
 router.route("/getUserFileExplorer").get(verifyJWT, userFileExplorer);
+router.route("/forgotPassword").patch(forgotPassword);
+router.route("/resetPassword/:token").patch(resetPassword);
 
 export default router;

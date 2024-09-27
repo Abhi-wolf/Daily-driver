@@ -46,8 +46,13 @@ function AddOrEditProjectModel({
             toast.success("Project created successfully");
             onClose(false);
           },
+          onError: (error) => {
+            toast.error(error?.message);
+          },
         }
       );
+
+      onClose(false);
     } catch (error) {
       console.log("AddFileOrFolder error = ", error);
     }

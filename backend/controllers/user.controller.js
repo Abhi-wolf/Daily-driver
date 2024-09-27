@@ -2,6 +2,8 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendEmail } from "../utils/sendEmail.js";
+import crypto from "crypto";
 
 /**
  * @desc Generate new access token and refresh token
@@ -79,10 +81,42 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  // return the newly created user
+  // // return the newly created user
+  // return res
+  //   .status(201)
+  //   .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+
+  // destructure access and refresh token from the function
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    createdUser._id
+  );
+
+  // define options for cookie
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  // set the cookies and return email and name with the response object
   return res
-    .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: {
+            email: createdUser.email,
+            name: createdUser.name,
+            profilePic: createdUser.profilePic,
+          },
+          accessToken,
+          refreshToken,
+        },
+        "User Signed Up Successfully"
+      )
+    );
 });
 
 /**
@@ -143,8 +177,8 @@ const loginUser = asyncHandler(async (req, res) => {
             name: existinguser.name,
             profilePic: existinguser.profilePic,
           },
-          // accessToken,
-          // refreshToken,
+          accessToken,
+          refreshToken,
         },
         "User logged In Successfully"
       )
@@ -287,6 +321,87 @@ const userFileExplorer = asyncHandler(async (req, res) => {
   }
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+
+  try {
+    if (user) {
+      const resetToken = user.createPasswordResetToken();
+      await user.save();
+
+      const resetLink = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
+
+      const message = `
+        <p>Dear ${user.name},</p>
+        <p>We received a request to reset your password for your account. If you made this request, please click the link below to reset your password:</p>
+        <a href="${resetLink}"><strong>Reset Password</strong></a>
+        <p>This link will expire in 01 hour only. If you did not request a password reset, you can safely ignore this email.</p>
+        <p>Best regards,<br/>The Team</p>
+      `;
+
+      await sendEmail({
+        email,
+        subject: "Password Reset Request (Token valid for 01 hour only)",
+        message,
+      });
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, "Password Reset Email sent successfully"));
+    }
+  } catch (error) {
+    if (user) {
+      user.passwordResetExpires = undefined;
+      user.passwordResetToken = undefined;
+      await user.save();
+    }
+    return res.status(500).json(new ApiError(500, "Internal Error"));
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  if (!token) {
+    throw new ApiError(400, "Token not found");
+  }
+
+  if (!password) {
+    throw new ApiError(400, "Password is required");
+  }
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Token is invalid");
+  }
+
+  try {
+    user.password = password;
+    (user.passwordResetToken = undefined),
+      (user.passwordResetExpires = undefined),
+      await user.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Password reset successfull"));
+  } catch (error) {
+    return res.status(500).json(new ApiError(500, "Internal Error"));
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -294,4 +409,6 @@ export {
   getUser,
   updateFolder,
   userFileExplorer,
+  forgotPassword,
+  resetPassword,
 };

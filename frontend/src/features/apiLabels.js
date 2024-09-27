@@ -2,7 +2,7 @@ const apiURL = import.meta.env.VITE_BASE_URL;
 
 export async function getLabels() {
   try {
-    const res = await fetch(`${apiURL}/label/getLabels`, {
+    const res = await fetch(`${apiURL}/label/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export async function getLabels() {
 
 export async function addNewLabel({ newLabel }) {
   try {
-    const res = await fetch(`${apiURL}/label/addNewLabel`, {
+    const res = await fetch(`${apiURL}/label/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,5 +56,35 @@ export async function addNewLabel({ newLabel }) {
       throw new Error(err.response.data.message);
     }
     throw new Error(err);
+  }
+}
+
+export async function deleteLabel({ labelId }) {
+  console.log("labelId = ", labelId);
+
+  try {
+    const res = await fetch(`${apiURL}/label/${labelId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+
+    const data = await res.json();
+    console.log("LABEL DELETE FUNCTION = ", data);
+    return null;
+  } catch (error) {
+    console.error(error);
+    if (error.response) {
+      throw new Error(error.response.data.message);
+    }
+
+    throw new Error(error);
   }
 }

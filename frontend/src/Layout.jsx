@@ -1,6 +1,6 @@
-import Player from "./components/MusicPlayer/Player";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
+import Player from "./components/Music/Player";
 import { Outlet } from "react-router-dom";
 
 function Layout() {
@@ -9,7 +9,8 @@ function Layout() {
       <Topbar />
       <div className="flex transition-all h-[96vh] mt-10">
         <Sidebar />
-        <section className="overflow-y-auto flex gap-2 w-full">
+        {/* <section className="overflow-y-auto flex gap-2 w-full"> */}
+        <section className=" flex gap-2 w-full">
           <Outlet />
           <Player />
         </section>

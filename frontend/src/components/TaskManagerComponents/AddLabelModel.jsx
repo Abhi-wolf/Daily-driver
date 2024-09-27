@@ -34,11 +34,16 @@ function AddLabelModel() {
         {
           onSuccess: (data) => {
             console.log(data);
-            toast.success("Project created successfully");
+            toast.success("Label added successfully");
             onClose(false);
+          },
+          onError: (error) => {
+            toast.error(error?.message);
           },
         }
       );
+
+      onClose(false);
     } catch (error) {
       console.log("AddFileOrFolder error = ", error);
     }

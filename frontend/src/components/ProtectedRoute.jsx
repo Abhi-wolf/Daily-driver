@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
   console.log(user);
 
   if (!user?.email) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/main" replace />;
   }
 
   // Render the protected route if authenticated

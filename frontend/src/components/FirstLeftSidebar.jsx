@@ -7,8 +7,8 @@ import {
   CalendarDays,
   Command,
   FolderPlus,
+  Music,
   PencilLineIcon,
-  Settings,
   Vault,
 } from "lucide-react";
 import { useState } from "react";
@@ -39,7 +39,10 @@ function FirstLeftSidebar() {
                 <Command className="h-5 w-5 hover:text-gray-400 transition " />
               </ToolTip>
             </li>
-            <li className="list-none cursor-pointer">
+            <li
+              className="list-none cursor-pointer"
+              onClick={() => navigate("/calendar")}
+            >
               <ToolTip text="Calender">
                 <CalendarDays className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
@@ -73,6 +76,14 @@ function FirstLeftSidebar() {
                 <Vault className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
+            <li
+              className="list-none cursor-pointer"
+              onClick={() => navigate("/music")}
+            >
+              <ToolTip text="Music">
+                <Music className="h-5 w-5 hover:text-gray-400 transition" />
+              </ToolTip>
+            </li>
           </div>
 
           {addNewTaskModal && (
@@ -82,7 +93,7 @@ function FirstLeftSidebar() {
             />
           )}
 
-          <div className="flex flex-col justify-center gap-8 p-1 m-2 ">
+          {/* <div className="flex flex-col justify-center gap-8 p-1 m-2 ">
             <li
               className="list-none cursor-pointer"
               onClick={() => navigate("/profile")}
@@ -91,7 +102,7 @@ function FirstLeftSidebar() {
                 <Settings className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

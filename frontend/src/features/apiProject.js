@@ -63,6 +63,8 @@ export async function addNewProject({ newProject }) {
 export async function getProject({ projectId }) {
   // console.log("projectId = ", projectId);
 
+  if (!projectId) return null;
+
   try {
     const res = await fetch(`${apiURL}/project/${projectId}`, {
       method: "GET",

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { FireExtinguisher, Plus, Trash } from "lucide-react";
 // import { FaFire } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
@@ -37,6 +37,10 @@ export const KanbanBoard = () => {
 
 const Board = ({ projectTasks }) => {
   const [cards, setCards] = useState(projectTasks);
+
+  useEffect(() => {
+    setCards(projectTasks);
+  }, [projectTasks]);
 
   return (
     <div className="flex h-full w-full gap-1 p-1 md:p-4 justify-around flex-wrap">
@@ -101,7 +105,7 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
       if (!cardToTransfer) return;
       cardToTransfer = { ...cardToTransfer, column };
 
-      projectTasks = projectTasks.filter((c) => c._id !== cardId);
+      projectTasks = projectTasks?.filter((c) => c._id !== cardId);
 
       const moveToBack = before === "-1";
 
@@ -168,7 +172,7 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
       },
       {
         offset: Number.NEGATIVE_INFINITY,
-        element: indicators[indicators.length - 1],
+        element: indicators[indicators?.length - 1],
       }
     );
 
@@ -184,14 +188,14 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
     setActive(false);
   };
 
-  const filteredCards = cards.filter((c) => c.column === column);
+  const filteredCards = cards?.filter((c) => c.column === column);
 
   return (
     <div className="w-64 shrink-0">
       <div className="mb-3 flex items-center justify-between">
         <h3 className={`text-lg font-semibold ${headingColor}`}>{title}</h3>
         <span className="rounded text-sm text-neutral-400">
-          {filteredCards.length}
+          {filteredCards?.length}
         </span>
       </div>
       <div
@@ -203,7 +207,7 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
           active ? "bg-neutral-800/50" : "bg-neutral-800/0"
         }`}
       >
-        {filteredCards.map((c) => {
+        {filteredCards?.map((c) => {
           return <Card key={c._id} {...c} handleDragStart={handleDragStart} />;
         })}
         <DropIndicator beforeId={null} column={column} />
@@ -257,14 +261,14 @@ const BurnBarrel = ({ setCards, cards }) => {
   const handleDragEnd = (e) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    const projectTasks = cards.filter((card) => card._id !== cardId);
+    const projectTasks = cards?.filter((card) => card._id !== cardId);
     console.log("DELETE CARD = ", projectTasks);
 
     updateProjectTasks(
       { projectId, projectTasks },
       {
         onSuccess: () => {
-          toast.success("Task successfully deleted");
+          toast.success("Task successfully updated");
         },
       }
     );

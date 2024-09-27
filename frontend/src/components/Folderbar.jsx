@@ -7,6 +7,7 @@ import { useState } from "react";
 import AddFileOrFolder from "./AddFolderOrFile";
 import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
 import { useUpdateFileExplorer } from "../hooks/fileExplorer/useUpdateFileExplorer";
+import { MediumSpinner } from "./Spinners";
 
 function Folderbar() {
   // const explorerData = {};
@@ -39,7 +40,7 @@ function Folderbar() {
   };
 
   if (isPending || isUpdating) {
-    return <h1>Pending ..... </h1>;
+    return <MediumSpinner />;
   }
 
   return (

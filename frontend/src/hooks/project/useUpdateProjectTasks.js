@@ -9,7 +9,9 @@ export function useUpdateProjectTasks() {
   const { mutate: updateProjectTasks, isPending } = useMutation({
     mutationFn: updateProjectTasksApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      }
     },
   });
 
