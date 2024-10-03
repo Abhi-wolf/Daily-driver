@@ -1,15 +1,12 @@
-import Folderbar from "../components/Folderbar";
-import { useFileExplorerStore } from "../store";
+import { Outlet } from "react-router";
+import Folderbar from "../components/FileExplorer/Folderbar";
 
 function Files() {
-  const { fileToOpen } = useFileExplorerStore();
-
   return (
     <>
       <Folderbar />
-      <div className="w-full overflow-y-auto overflow-x-hidden">
-        {fileToOpen}
-        Dashboard
+      <div className="w-full overflow-x-hidden">
+        <Outlet />
       </div>
     </>
   );

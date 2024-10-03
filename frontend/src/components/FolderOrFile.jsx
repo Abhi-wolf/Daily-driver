@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-"use client";
 
+import { toast } from "sonner";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -28,19 +28,17 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { useFileExplorerStore } from "../store";
+import { useCreateNewFolder } from "../hooks/fileExplorer/useCreateNewFolder";
+import { useGetFolder } from "../hooks/fileExplorer/useGetFolder";
+import { useCreateNewFile } from "../hooks/fileExplorer/useCreateNewFile";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteFolder } from "../hooks/fileExplorer/useDeleteFolder";
+import { useDeleteFile } from "../hooks/fileExplorer/useDeleteFile";
+import { useRenameFolder } from "../hooks/fileExplorer/useRenameFolder";
 
-function FolderOrFile({
-  folder,
-  handleInsertNode,
-  handleRenameNode,
-  handleDeleteNode,
-}) {
-  const navigate = useNavigate();
-  const { setFileToOpen } = useFileExplorerStore();
-  const [expand, setExpand] = useState(false);
+function FolderOrFile({ folder }) {
   const [deleteFileFolder, setDeleteFileFolder] = useState(false);
-
+  const [expand, setExpand] = useState(false);
   const [showInput, setShowInput] = useState({
     visible: false,
     isFolder: null,
@@ -51,23 +49,83 @@ function FolderOrFile({
     isFolder: null,
   });
 
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { createNewFolder } = useCreateNewFolder();
+  const { createNewFile } = useCreateNewFile();
+  const { renameFolder } = useRenameFolder();
+  const { data: contents } = useGetFolder(expand ? folder._id : null);
+
   // add new file or folder
   function handleNewFileOrFolder(e, isFolder) {
     e.stopPropagation();
-    console.log("isfolder = ", isFolder);
     setExpand(true);
     setShowInput({
       visible: true,
       isFolder: isFolder,
     });
-
-    console.log(showInput);
   }
 
-  function onAddFileOrFolder(e) {
+  async function onAddFileOrFolder(e) {
     if (e.keyCode === 13 && e.target.value) {
-      console.log("save file or folder");
-      handleInsertNode(folder.id, e.target.value, showInput.isFolder);
+      // Fetch existing contents (folders and files)
+      const existingItems = folder?.items || [];
+
+      // Check if a folder/file with the same name already exists
+      const duplicate = existingItems?.some((item) =>
+        item.type === "folder"
+          ? item.folderName.toLowerCase() ===
+            e.target.value.trim().toLowerCase()
+          : item.fileName.toLowerCase() === e.target.value.trim().toLowerCase()
+      );
+
+      if (duplicate) {
+        toast.error("A file or folder with this name already exists.");
+        return;
+      }
+
+      if (showInput.isFolder) {
+        const newData = {
+          folderName: e.target.value,
+          parentFolder: folder?._id ? folder._id : null,
+        };
+
+        createNewFolder(
+          { newData },
+          {
+            onSuccess: () => {
+              toast.success("Folder created successfully");
+              queryClient.invalidateQueries({
+                queryKey: ["folder", folder?._id],
+              });
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      } else {
+        const newData = {
+          fileName: e.target.value,
+          parentFolder: folder?._id ? folder._id : null,
+        };
+
+        createNewFile(
+          { newData },
+          {
+            onSuccess: () => {
+              toast.success("File created successfully");
+              queryClient.invalidateQueries({
+                queryKey: ["folder", folder?._id],
+              });
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      }
+
       setShowInput({ ...showInput, visible: false });
     }
   }
@@ -76,27 +134,65 @@ function FolderOrFile({
   function handleRename(e, isFolder) {
     e.stopPropagation();
     setExpand(true);
+
     setRename({
       visible: true,
       isFolder: isFolder,
     });
-
-    console.log(rename);
   }
 
   function onRenameFileOrFolder(e) {
     if (e.keyCode === 13 && e.target.value) {
-      console.log("rename file or folder");
-      handleRenameNode(folder.id, e.target.value);
+      const existingItems = folder?.items || [];
+
+      const name = e.target.value.trim();
+
+      // Check if a folder/file with the same name already exists
+      const duplicate = existingItems?.some((item) =>
+        item.type === "folder"
+          ? item.folderName.toLowerCase() === name.toLowerCase()
+          : item.fileName.toLowerCase() === name.toLowerCase()
+      );
+
+      if (duplicate) {
+        toast.error("A file or folder with this name already exists.");
+        return;
+      }
+
+      if (rename.isFolder) {
+        const newName = e.target.value;
+        const folderId = folder._id;
+
+        renameFolder(
+          { newName, folderId },
+          {
+            onSuccess: () => {
+              toast.success("Folder renamed successfully");
+
+              if (folder?.parentFolder) {
+                console.error(folder?._id);
+                queryClient.invalidateQueries({
+                  queryKey: ["folder", folder?.parentFolder],
+                });
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+              }
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      }
       setRename({ ...rename, visible: false });
     }
   }
 
   return (
-    <>
+    <div className="w-full max-w-full overflow-y-auto px-2">
       <ContextMenu>
         <ContextMenuTrigger>
-          {folder.isFolder ? (
+          {folder?.type === "folder" ? (
             <>
               <div
                 onClick={() => setExpand(!expand)}
@@ -123,7 +219,7 @@ function FolderOrFile({
                     />
                   </div>
                 ) : (
-                  folder?.name
+                  <p className="overflow-hidden">{folder?.folderName}</p>
                 )}
               </div>
               <div className={`${expand ? "block" : "hidden"} pl-6`}>
@@ -136,23 +232,14 @@ function FolderOrFile({
                     </span>
                     <Input
                       type="text"
-                      // defaultValue="undefined"
                       placeholder="Name...."
                       className="bg-gray-100"
                       onKeyDown={onAddFileOrFolder}
                     />
                   </div>
                 )}
-                {folder.items.map((item) => {
-                  return (
-                    <FolderOrFile
-                      folder={item}
-                      key={item.id}
-                      handleInsertNode={handleInsertNode}
-                      handleRenameNode={handleRenameNode}
-                      handleDeleteNode={handleDeleteNode}
-                    />
-                  );
+                {contents?.items?.map((item) => {
+                  return <FolderOrFile folder={item} key={item._id} />;
                 })}
               </div>
             </>
@@ -160,8 +247,7 @@ function FolderOrFile({
             <div
               className="text-gray-500 font-semibold text-sm p-2 bg-gray-100 my-2 rounded-md cursor-pointer"
               onClick={() => {
-                setFileToOpen(folder?.id);
-                navigate("/files");
+                navigate(`/files/${folder?._id}`);
               }}
             >
               {rename.visible ? (
@@ -181,27 +267,18 @@ function FolderOrFile({
                   />
                 </div>
               ) : (
-                <div className="flex gap-2 items-center">
-                  <File className="w-4 h-4" />
-                  {folder?.name}
+                <div className="flex gap-2 items-center overflow-hidden">
+                  <File className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate flex-grow-0">
+                    {folder?.fileName}
+                  </span>
                 </div>
               )}
             </div>
           )}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
-          {folder.isFolder && (
-            <ContextMenuItem
-              inset
-              className="flex gap-4"
-              onClick={(e) => handleNewFileOrFolder(e, false)}
-            >
-              <Pencil2Icon className="w-4 h-4" />
-              <span> New Note</span>
-            </ContextMenuItem>
-          )}
-
-          {folder.isFolder && (
+          {folder?.type === "folder" && (
             <ContextMenuItem
               inset
               className="flex gap-4"
@@ -212,12 +289,23 @@ function FolderOrFile({
             </ContextMenuItem>
           )}
 
-          {folder.isFolder && <ContextMenuSeparator />}
+          {folder?.type === "folder" && (
+            <ContextMenuItem
+              inset
+              className="flex gap-4"
+              onClick={(e) => handleNewFileOrFolder(e, false)}
+            >
+              <Pencil2Icon className="w-4 h-4" />
+              <span> New Note</span>
+            </ContextMenuItem>
+          )}
+
+          {folder?.type === "folder" && <ContextMenuSeparator />}
 
           <ContextMenuItem
             inset
             className="flex gap-4"
-            onClick={(e) => handleRename(e, folder.isFolder)}
+            onClick={(e) => handleRename(e, folder?.type === "folder")}
           >
             <Pencil className="w-4 h-4" />
             <span> Rename</span>
@@ -239,17 +327,58 @@ function FolderOrFile({
         <ConfirmDeleteDianlog
           isOpen={deleteFileFolder}
           onClose={setDeleteFileFolder}
-          handleDeleteNode={handleDeleteNode}
-          id={folder.id}
+          id={folder._id}
+          isFolder={folder.type === "folder"}
+          parent={folder.parentFolder}
         />
       )}
-    </>
+    </div>
   );
 }
 
-function ConfirmDeleteDianlog({ onClose, isOpen, id, handleDeleteNode }) {
+function ConfirmDeleteDianlog({ onClose, isOpen, id, isFolder, parent }) {
+  const queryClient = useQueryClient();
+  const { deleteFolder, isDeletingFolder } = useDeleteFolder();
+  const { deleteFile } = useDeleteFile();
+
   const handleSubmit = () => {
-    handleDeleteNode(id);
+    if (isFolder) {
+      deleteFolder(
+        { folderId: id },
+        {
+          onSuccess: () => {
+            toast.success("Folder deleted successfully");
+            onClose(false);
+
+            if (parent)
+              queryClient.invalidateQueries({ queryKey: ["folder", parent] });
+            else queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+          },
+          onError: (err) => {
+            onClose(false);
+            toast.error(err.message);
+          },
+        }
+      );
+    } else {
+      deleteFile(
+        { fileId: id },
+        {
+          onSuccess: () => {
+            toast.success("File deleted successfully");
+            onClose(false);
+
+            if (parent)
+              queryClient.invalidateQueries({ queryKey: ["folder", parent] });
+            else queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+          },
+          onError: (err) => {
+            onClose(false);
+            toast.error(err.message);
+          },
+        }
+      );
+    }
   };
 
   return (
@@ -261,8 +390,13 @@ function ConfirmDeleteDianlog({ onClose, isOpen, id, handleDeleteNode }) {
             Once deleted the file or folder cannot be recovered
           </DialogDescription>
         </DialogHeader>
-        <Button type="submit" variant="destructive" onClick={handleSubmit}>
-          Save changes
+        <Button
+          type="submit"
+          variant="destructive"
+          disabled={isDeletingFolder}
+          onClick={handleSubmit}
+        >
+          Confirm Delete
         </Button>
       </DialogContent>
     </Dialog>

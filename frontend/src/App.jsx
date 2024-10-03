@@ -13,6 +13,7 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Todos from "./pages/Todos";
+import NotesEditor from "./pages/NotesEditor";
 
 function App() {
   return (
@@ -27,18 +28,18 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index path="/files" element={<Files />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/files" element={<Files />}>
+            <Route path=":fileId" element={<NotesEditor />} />
+          </Route>
+          <Route index path="/calendar" element={<CalendarPage />} />
           <Route path="/music" element={<Music />} />
           <Route path="/tasksmanager" element={<TaskManager />}>
             <Route
               index
               element={<Navigate to="/tasksmanager/todos" replace />}
-            />{" "}
-            {/* Redirect when `/tasksmanager` is visited */}
-            <Route path="todos" element={<Todos />} />{" "}
-            {/* This handles `/tasksmanager/todos` */}
+            />
+            <Route path="todos" element={<Todos />} />
             <Route path="project/:projectId" element={<KanbanBoard />} />
           </Route>
         </Route>
@@ -46,6 +47,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/resetPassword/:token" element={<ResetPassword />} />
+        <Route />
       </Routes>
     </BrowserRouter>
   );

@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { useNavigate } from "react-router";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -11,27 +10,84 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useForm } from "react-hook-form";
+import { useCreateNewFolder } from "../hooks/fileExplorer/useCreateNewFolder";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCreateNewFile } from "../hooks/fileExplorer/useCreateNewFile";
 import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
-import { useUpdateFileExplorer } from "../hooks/fileExplorer/useUpdateFileExplorer";
 
-function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
-  // const explorerData = [];
-  const { updateFileExplorer, isUpdating } = useUpdateFileExplorer();
+function AddFileOrFolder({ isOpen, onClose, isFolder }) {
+  const queryClient = useQueryClient();
+  const { createNewFolder, isCreatingNewFolder } = useCreateNewFolder();
+  const { createNewFile, isCreatingNewFile } = useCreateNewFile();
   const { data: explorerData } = useGetUserFileExplorer();
-  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = async (item) => {
+  const onSubmit = async (newData) => {
+    // Fetch existing contents (folders and files)
+    const existingItems = explorerData || [];
+
+    console.log("existingItems = ", existingItems);
+
+    // Check if a folder/file with the same name already exists
+    let duplicate;
+    if (isFolder) {
+      duplicate = existingItems?.some((item) =>
+        item.type === "folder"
+          ? item.folderName.toLowerCase() === newData.folderName.toLowerCase()
+          : item.fileName.toLowerCase() === newData.folderName.toLowerCase()
+      );
+    } else {
+      duplicate = existingItems?.some((item) =>
+        item.type === "folder"
+          ? item.folderName.toLowerCase() === newData.fileName.toLowerCase()
+          : item.fileName.toLowerCase() === newData.fileName.toLowerCase()
+      );
+    }
+
+    console.log("duplicate = ", duplicate);
+
+    if (duplicate) {
+      toast.error("A file or folder with this name already exists.");
+      return;
+    }
+
     try {
-      const finalTree = insertNode(explorerData, "1", item.name, isFolder);
-      console.log(finalTree);
-      updateFileExplorer({ finalTree });
-      onClose(false);
-      navigate("/files");
+      newData = { ...newData, parentFolder: null };
+
+      if (isFolder) {
+        createNewFolder(
+          { newData },
+          {
+            onSuccess: () => {
+              toast.success("Folder created successfully");
+              onClose(false);
+              queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      } else {
+        createNewFile(
+          { newData },
+          {
+            onSuccess: () => {
+              toast.success("File created successfully");
+              onClose(false);
+              queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
+      }
     } catch (error) {
       console.log("AddFileOrFolder error = ", error);
     }
@@ -59,17 +115,22 @@ function AddFileOrFolder({ isOpen, onClose, isFolder, insertNode }) {
               {isFolder ? "folder" : "file"} name
             </Label>
             <Input
-              id="name"
+              id={isFolder ? "folderName" : "fileName"}
               className="col-span-3"
-              disabled={isUpdating}
-              {...register("name", { required: true })}
+              disabled={isCreatingNewFile || isCreatingNewFolder}
+              {...register(isFolder ? "folderName" : "fileName", {
+                required: true,
+              })}
             />
 
             {errors.name && (
               <span className="text-red-400 my-1">Name is required.</span>
             )}
           </div>
-          <Button type="submit" disabled={false}>
+          <Button
+            type="submit"
+            disabled={isCreatingNewFile || isCreatingNewFolder}
+          >
             Save changes
           </Button>
         </form>

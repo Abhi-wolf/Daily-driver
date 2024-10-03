@@ -21,7 +21,9 @@ export const KanbanBoard = () => {
   return (
     <div className=" w-full bg-white text-gray-500 h-full  md:p-4">
       {isPending ? (
-        <LargeSpinner />
+        <div className="w-fill min-h-full flex items-center justify-center">
+          <LargeSpinner />
+        </div>
       ) : (
         <>
           <h1 className="text-2xl font-bold text-violet-500 p-2 underline decoration-wavy">

@@ -3,7 +3,7 @@ import { Song } from "../models/song.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadFile } from "../utils/uploadFile.js";
+import { deleteFile, uploadFile } from "../utils/uploadFile.js";
 
 const addSong = asyncHandler(async (req, res) => {
   const { songName, songImageUrl, playListName } = req.body;
@@ -33,13 +33,14 @@ const addSong = asyncHandler(async (req, res) => {
     });
 
     let songUrl = "";
+    let metadata = {};
     if (localFilePath) {
-      songUrl = await uploadFile(localFilePath);
+      let { url, metadata } = await uploadFile(localFilePath);
 
-      if (!songUrl) {
+      if (!url) {
         throw new ApiError(500, "Internal Error -- song not uploaded");
       } else {
-        songUrl = songUrl?.url;
+        songUrl = url;
       }
     }
 
@@ -47,6 +48,7 @@ const addSong = asyncHandler(async (req, res) => {
       songName,
       songUrl,
       songImageUrl,
+      metadata,
       createdBy: userId,
     });
 
@@ -93,6 +95,9 @@ const deleteSong = asyncHandler(async (req, res) => {
   }
 
   try {
+    const fileUrl = song.songUrl;
+
+    await deleteFile(fileUrl);
     await Song.findByIdAndDelete(songId);
 
     return res

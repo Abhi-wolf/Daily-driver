@@ -17,6 +17,9 @@ const songSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "User",
   },
+  metadata: {
+    type: Object,
+  },
 });
 
 export const Song = mongoose.model("Song", songSchema);

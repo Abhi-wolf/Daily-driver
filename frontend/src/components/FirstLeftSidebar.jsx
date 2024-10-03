@@ -9,7 +9,6 @@ import {
   FolderPlus,
   Music,
   PencilLineIcon,
-  Vault,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -71,11 +70,6 @@ function FirstLeftSidebar() {
               </ToolTip>
             </li>
 
-            <li className="list-none cursor-pointer">
-              <ToolTip text="Debt & Lendings">
-                <Vault className="h-5 w-5 hover:text-gray-400 transition" />
-              </ToolTip>
-            </li>
             <li
               className="list-none cursor-pointer"
               onClick={() => navigate("/music")}

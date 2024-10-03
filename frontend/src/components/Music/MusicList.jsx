@@ -15,6 +15,7 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { useDeleteSong } from "../../hooks/songs/useDeleteSong";
 import { toast } from "sonner";
+import DataNotFound from "../DataNotFound";
 
 function MusicList() {
   const { songs, isPending: isGettingSongs } = useGetSongs();
@@ -36,7 +37,7 @@ function MusicList() {
           {songs?.map((song) => (
             <li
               key={song._id}
-              className="flex justify-between items-center text-lg list-none border-2 border-gray-200 p-2 text-gray-600 rounded-md "
+              className="flex justify-between items-center text-lg list-none border-2 border-gray-200 p-2 text-gray-600 rounded-md bg-slate-100"
             >
               <span> {song?.songName}</span>
 
@@ -55,9 +56,7 @@ function MusicList() {
       )}
 
       {!isGettingSongs && songs.length === 0 && (
-        <h3 className="text-green-300 text-xl text-center italic">
-          No Songs Found
-        </h3>
+        <DataNotFound size="2xl" message="No Songs Found" />
       )}
     </div>
   );
