@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { updateFileContent as updateFileContentApi } from "../../features/apiFile";
+import { updateFile } from "../../features/apiFile";
 
 export function useFileUpdateContent() {
   const { mutate: updateFileContent, isPending: isUpdatingFileContent } =
     useMutation({
-      mutationFn: updateFileContentApi,
+      mutationFn: updateFile,
     });
 
   return { updateFileContent, isUpdatingFileContent };

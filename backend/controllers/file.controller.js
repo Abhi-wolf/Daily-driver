@@ -43,8 +43,9 @@ const createFile = asyncHandler(async (req, res) => {
 
 const updateFile = asyncHandler(async (req, res) => {
   const { fileId } = req.params;
-  const { data } = req.body;
   const userId = req.user._id;
+
+  console.log("UPDATE FILE = ", req.body);
 
   if (!fileId) {
     throw new ApiError(404, "File id is required");
@@ -57,11 +58,17 @@ const updateFile = asyncHandler(async (req, res) => {
   }
 
   try {
-    const updatedFile = await File.findByIdAndUpdate(fileId, { data });
+    if (req.body?.fileName) {
+      console.error("FILE NAME");
+      file.fileName = req.body.fileName;
+    } else if (req.body?.data) {
+      file.data = req.body.data;
+    }
+    await file.save();
 
     return res
       .status(200)
-      .json(new ApiResponse(200, updatedFile, "File updated successfully"));
+      .json(new ApiResponse(200, "File updated successfully"));
   } catch (error) {
     console.error(error);
     throw new ApiError(500, "Internal error");

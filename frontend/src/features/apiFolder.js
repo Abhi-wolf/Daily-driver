@@ -17,7 +17,6 @@ export async function getFolders() {
     }
 
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
     console.log(err);
@@ -29,6 +28,8 @@ export async function getFolders() {
   }
 }
 export async function getFolder(folderId) {
+  console.log("Folder ID = ", folderId);
+
   try {
     const res = await fetch(`${apiURL}/folders/${folderId}`, {
       method: "GET",

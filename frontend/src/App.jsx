@@ -14,6 +14,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Todos from "./pages/Todos";
 import NotesEditor from "./pages/NotesEditor";
+import Folder from "./pages/Folder";
+import InitialExplorer from "./pages/InitialExplorer";
 
 function App() {
   return (
@@ -29,8 +31,10 @@ function App() {
           }
         >
           <Route path="/profile" element={<Profile />} />
-          <Route path="/files" element={<Files />}>
-            <Route path=":fileId" element={<NotesEditor />} />
+          <Route path="/fileExplorer" element={<Files />}>
+            <Route index element={<InitialExplorer />} />
+            <Route path="file/:fileId" element={<NotesEditor />} />
+            <Route path="folder/:folderId" element={<Folder />} />
           </Route>
           <Route index path="/calendar" element={<CalendarPage />} />
           <Route path="/music" element={<Music />} />

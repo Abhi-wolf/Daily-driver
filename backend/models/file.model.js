@@ -20,8 +20,8 @@ const fileSchema = new mongoose.Schema(
       default: false,
     },
     data: {
-      type: String,
-      default: "",
+      type: Object,
+      default: {},
     },
     createdBy: {
       type: mongoose.Schema.ObjectId,

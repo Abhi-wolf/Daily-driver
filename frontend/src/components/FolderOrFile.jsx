@@ -19,7 +19,7 @@ import {
 import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Input } from "./ui/input";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useDeleteFolder } from "../hooks/fileExplorer/useDeleteFolder";
 import { useDeleteFile } from "../hooks/fileExplorer/useDeleteFile";
 import { useRenameFolder } from "../hooks/fileExplorer/useRenameFolder";
+import { useRenameFile } from "../hooks/fileExplorer/useRenameFile";
 
 function FolderOrFile({ folder }) {
   const [deleteFileFolder, setDeleteFileFolder] = useState(false);
@@ -53,8 +54,12 @@ function FolderOrFile({ folder }) {
   const queryClient = useQueryClient();
   const { createNewFolder } = useCreateNewFolder();
   const { createNewFile } = useCreateNewFile();
-  const { renameFolder } = useRenameFolder();
-  const { data: contents } = useGetFolder(expand ? folder._id : null);
+  const { renameFolder, isRenamingFolder } = useRenameFolder();
+  const { renameFile, isRenamingFile } = useRenameFile();
+  const { data: contents } = useGetFolder(
+    expand && folder.type === "folder" ? folder._id : null
+  );
+  const params = useParams();
 
   // add new file or folder
   function handleNewFileOrFolder(e, isFolder) {
@@ -135,6 +140,8 @@ function FolderOrFile({ folder }) {
     e.stopPropagation();
     setExpand(true);
 
+    console.error("isFolder = ", isFolder);
+
     setRename({
       visible: true,
       isFolder: isFolder,
@@ -183,6 +190,29 @@ function FolderOrFile({ folder }) {
             },
           }
         );
+      } else {
+        const fileName = e.target.value;
+        const fileId = folder._id;
+
+        renameFile(
+          { fileName, fileId },
+          {
+            onSuccess: () => {
+              toast.success("File renamed successfully");
+              if (folder?.parentFolder) {
+                console.error(folder?._id);
+                queryClient.invalidateQueries({
+                  queryKey: ["folder", folder?.parentFolder],
+                });
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["fileExplorer"] });
+              }
+            },
+            onError: (error) => {
+              toast.error(error.message);
+            },
+          }
+        );
       }
       setRename({ ...rename, visible: false });
     }
@@ -195,8 +225,15 @@ function FolderOrFile({ folder }) {
           {folder?.type === "folder" ? (
             <>
               <div
-                onClick={() => setExpand(!expand)}
-                className="flex gap-2 text-gray-500 font-semibold text-sm capitalize cursor-pointer p-2  my-2 rounded-md hover:bg-gray-300"
+                onClick={() => {
+                  setExpand(!expand);
+                  navigate(`/fileExplorer/folder/${folder?._id}`);
+                }}
+                className={`${
+                  params?.folderId === folder?._id
+                    ? "text-green-500 bg-green-200"
+                    : "text-gray-500 hover:bg-gray-300"
+                } flex gap-2  font-semibold text-sm capitalize cursor-pointer p-2  my-2 rounded-md `}
               >
                 {expand ? (
                   <ChevronDown className="w-4 h-4" />
@@ -213,7 +250,7 @@ function FolderOrFile({ folder }) {
                     </span>
                     <Input
                       type="text"
-                      defaultValue={folder.name}
+                      defaultValue={folder.folderName}
                       className="bg-gray-100"
                       onKeyDown={onRenameFileOrFolder}
                     />
@@ -233,6 +270,8 @@ function FolderOrFile({ folder }) {
                     <Input
                       type="text"
                       placeholder="Name...."
+                      defaultValue={folder?.folderName}
+                      disabled={isRenamingFolder}
                       className="bg-gray-100"
                       onKeyDown={onAddFileOrFolder}
                     />
@@ -245,9 +284,13 @@ function FolderOrFile({ folder }) {
             </>
           ) : (
             <div
-              className="text-gray-500 font-semibold text-sm p-2 bg-gray-100 my-2 rounded-md cursor-pointer"
+              className={`${
+                params?.fileId === folder?._id
+                  ? "text-green-500 bg-green-200"
+                  : "text-gray-500 hover:bg-gray-300 bg-gray-100"
+              } font-semibold text-sm p-2  my-2 rounded-md cursor-pointer`}
               onClick={() => {
-                navigate(`/files/${folder?._id}`);
+                navigate(`/fileExplorer/file/${folder?._id}`);
               }}
             >
               {rename.visible ? (
@@ -261,7 +304,8 @@ function FolderOrFile({ folder }) {
                   </span>
                   <Input
                     type="text"
-                    defaultValue={folder.name}
+                    defaultValue={folder?.fileName}
+                    disabled={isRenamingFile}
                     className="bg-gray-100"
                     onKeyDown={onRenameFileOrFolder}
                   />
@@ -305,7 +349,9 @@ function FolderOrFile({ folder }) {
           <ContextMenuItem
             inset
             className="flex gap-4"
-            onClick={(e) => handleRename(e, folder?.type === "folder")}
+            onClick={(e) =>
+              handleRename(e, folder?.type === "folder" ? true : false)
+            }
           >
             <Pencil className="w-4 h-4" />
             <span> Rename</span>

@@ -4,7 +4,6 @@ import { useUserStore } from "../store";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUserStore();
-  console.log(user);
 
   if (!user?.email) {
     return <Navigate to="/main" replace />;

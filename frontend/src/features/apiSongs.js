@@ -17,7 +17,6 @@ export async function getSongs() {
     }
 
     const data = await res.json();
-    console.log(data);
 
     return data?.data;
   } catch (err) {

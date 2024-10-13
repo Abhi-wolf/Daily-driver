@@ -27,7 +27,7 @@ function FirstLeftSidebar() {
           <div className="flex flex-col justify-center gap-8 p-1 m-2 ">
             <li
               className="list-none cursor-pointer"
-              onClick={() => navigate("/files")}
+              onClick={() => navigate("/fileExplorer")}
             >
               <ToolTip text="File Explorer">
                 <FolderPlus className="h-5 w-5 hover:text-gray-400 transition" />
