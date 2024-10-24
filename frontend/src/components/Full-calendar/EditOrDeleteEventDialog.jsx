@@ -26,11 +26,6 @@ export default function EditOrDeleteEventDialog({ isOpen, onClose, event }) {
     formState: { errors },
   } = useForm();
 
-  console.info(
-    "EditOrDeleteEventDialog = ",
-    convertToISOFormat(event?.startDate)
-  );
-
   const { deleteEvent, isDeleting } = useDeleteEvent();
   const { updateEvent, isUpdatingEvent } = useUpdateEvent();
 

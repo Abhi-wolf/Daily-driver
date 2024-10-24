@@ -1,14 +1,27 @@
+import { useEffect } from "react";
 import DataNotFound from "../components/DataNotFound";
 import FileBox from "../components/FileExplorer/common/FileBox";
 import FolderBox from "../components/FileExplorer/common/FolderBox";
 import { LargeSpinner } from "../components/Spinners";
 import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
+import ErrorMessage from "../components/ErrorMessage";
 
 function InitialExplorer() {
-  const { data: explorerData, isPending } = useGetUserFileExplorer();
+  const {
+    data: explorerData,
+    isPending,
+    error,
+    isError,
+  } = useGetUserFileExplorer();
+
+  console.log(isError);
+
+  if (isError) {
+    return <ErrorMessage message={error?.message || "Something went wrong"} />;
+  }
 
   return (
-    <div className="flex flex-wrap gap-4 w-full min-h-full p-4 mt-8">
+    <div className="flex flex-wrap gap-4 w-full p-4 mt-8">
       {isPending ? (
         <LargeSpinner />
       ) : (
@@ -19,7 +32,7 @@ function InitialExplorer() {
             else return <FileBox key={item._id} file={item} />;
           })}
 
-          {explorerData.length === 0 && (
+          {explorerData?.length === 0 && (
             <DataNotFound message="No files and folders found" size="6xl" />
           )}
         </>

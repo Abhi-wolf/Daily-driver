@@ -10,11 +10,11 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useForm } from "react-hook-form";
-import { useCreateNewFolder } from "../hooks/fileExplorer/useCreateNewFolder";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCreateNewFile } from "../hooks/fileExplorer/useCreateNewFile";
 import { useGetUserFileExplorer } from "../hooks/fileExplorer/useGetFileExplorer";
+import { useCreateNewFile } from "../hooks/fileExplorer/useFile";
+import { useCreateNewFolder } from "../hooks/fileExplorer/useFolder";
 
 function AddFileOrFolder({ isOpen, onClose, isFolder }) {
   const queryClient = useQueryClient();

@@ -28,14 +28,18 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { useCreateNewFolder } from "../hooks/fileExplorer/useCreateNewFolder";
-import { useGetFolder } from "../hooks/fileExplorer/useGetFolder";
-import { useCreateNewFile } from "../hooks/fileExplorer/useCreateNewFile";
 import { useQueryClient } from "@tanstack/react-query";
-import { useDeleteFolder } from "../hooks/fileExplorer/useDeleteFolder";
-import { useDeleteFile } from "../hooks/fileExplorer/useDeleteFile";
-import { useRenameFolder } from "../hooks/fileExplorer/useRenameFolder";
-import { useRenameFile } from "../hooks/fileExplorer/useRenameFile";
+import {
+  useCreateNewFile,
+  useDeleteFile,
+  useRenameFile,
+} from "../hooks/fileExplorer/useFile";
+import {
+  useCreateNewFolder,
+  useDeleteFolder,
+  useGetFolder,
+  useRenameFolder,
+} from "../hooks/fileExplorer/useFolder";
 
 function FolderOrFile({ folder }) {
   const [deleteFileFolder, setDeleteFileFolder] = useState(false);

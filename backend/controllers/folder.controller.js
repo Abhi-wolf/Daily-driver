@@ -311,6 +311,14 @@ const renameFolder = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllDeletedFolders = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const folders = await Folder.find({ createdBy: userId, deleted: true });
+
+  return res.status(200).json(new ApiResponse(200, folders, "Deleted folders"));
+});
+
 export {
   createFolder,
   getAllFolders,
@@ -319,4 +327,5 @@ export {
   getFolder,
   renameFolder,
   permanentDeleteFolder,
+  getAllDeletedFolders,
 };

@@ -10,6 +10,7 @@ import songRouter from "./routes/song.routes.js";
 import todoRouter from "./routes/todo.routes.js";
 import folderRouter from "./routes/folder.routes.js";
 import fileRouter from "./routes/file.routes.js";
+import expenseRouter from "./routes/expense.routes.js";
 import { limiter } from "./middlewares/rateLimit.middleware.js";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api/v1/songs", songRouter);
 app.use("/api/v1/todos", todoRouter);
 app.use("/api/v1/folders", folderRouter);
 app.use("/api/v1/files", fileRouter);
+app.use("/api/v1/expense", expenseRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

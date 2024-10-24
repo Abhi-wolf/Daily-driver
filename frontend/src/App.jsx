@@ -16,6 +16,9 @@ import Todos from "./pages/Todos";
 import NotesEditor from "./pages/NotesEditor";
 import Folder from "./pages/Folder";
 import InitialExplorer from "./pages/InitialExplorer";
+import RecycleBin from "./pages/RecycleBin";
+import Expenses from "./pages/Expenses";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   return (
@@ -30,14 +33,19 @@ function App() {
             </ProtectedRoute>
           }
         >
+          {/* Make /calendar the index route */}
+          <Route index element={<CalendarPage />} />
+
+          {/* Explicitly define /calendar route */}
+          <Route path="calendar" element={<CalendarPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/fileExplorer" element={<Files />}>
             <Route index element={<InitialExplorer />} />
             <Route path="file/:fileId" element={<NotesEditor />} />
             <Route path="folder/:folderId" element={<Folder />} />
           </Route>
-          <Route index path="/calendar" element={<CalendarPage />} />
           <Route path="/music" element={<Music />} />
+          <Route path="/expenses" element={<Expenses />} />
           <Route path="/tasksmanager" element={<TaskManager />}>
             <Route
               index
@@ -46,12 +54,14 @@ function App() {
             <Route path="todos" element={<Todos />} />
             <Route path="project/:projectId" element={<KanbanBoard />} />
           </Route>
+
+          <Route path="/recyclebin" element={<RecycleBin />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/resetPassword/:token" element={<ResetPassword />} />
-        <Route />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   );

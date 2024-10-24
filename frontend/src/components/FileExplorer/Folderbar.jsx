@@ -57,10 +57,10 @@ function Folderbar() {
       </div>
 
       {isPending ? (
-        <div className="w-full h-full flex justify-center items-center">
-          <MediumSpinner />
-        </div>
+        // <div className="w-full h-full flex justify-center items-center">
+        <MediumSpinner />
       ) : (
+        // </div>
         <div className="overflow-y-hidden">
           {explorerData?.map((item) => {
             return <FolderOrFile folder={item} key={item._id} />;

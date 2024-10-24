@@ -9,6 +9,7 @@ import {
   FolderPlus,
   Music,
   PencilLineIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -64,7 +65,10 @@ function FirstLeftSidebar() {
               </ToolTip>
             </li>
 
-            <li className="list-none cursor-pointer">
+            <li
+              className="list-none cursor-pointer"
+              onClick={() => navigate("/expenses")}
+            >
               <ToolTip text="Spendings & Savings">
                 <BadgeIndianRupee className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
@@ -76,6 +80,15 @@ function FirstLeftSidebar() {
             >
               <ToolTip text="Music">
                 <Music className="h-5 w-5 hover:text-gray-400 transition" />
+              </ToolTip>
+            </li>
+
+            <li
+              className="list-none cursor-pointer"
+              onClick={() => navigate("/recyclebin")}
+            >
+              <ToolTip text="Recycle Bin">
+                <Trash2Icon className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
           </div>

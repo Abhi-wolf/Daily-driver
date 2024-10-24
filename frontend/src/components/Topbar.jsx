@@ -22,11 +22,13 @@ import TodaysDate from "./TodaysDate";
 function Topbar() {
   const [selected, setSelected] = useState();
   const [isOpen, onClose] = useState(false);
+
   const { removeUser } = useUserStore();
+  const { events } = useGetEvent();
+  const { user } = useUserStore();
+
   const { logout, isPending } = useLogout();
   const navigate = useNavigate();
-
-  const { events } = useGetEvent();
 
   let eventDays = events?.map((event) => ({
     from: new Date(event.startDate),
@@ -49,8 +51,8 @@ function Topbar() {
   };
 
   return (
-    <header className="w-full border-[1px] border-gray-300 fixed top-0 left-0">
-      <div className="p-2 flex justify-between items-center ">
+    <header className="w-full border-[1px] border-gray-300 fixed top-0 left-0 z-50">
+      <div className="flex justify-between items-center ">
         {/* left */}
         <div className="flex gap-4 items-center">
           <li className="list-none cursor-pointer">
@@ -62,7 +64,7 @@ function Topbar() {
         <TodaysDate />
 
         {/* right */}
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-6 items-center">
           <div>
             <Bell className=" h-5 w-5 hover:text-gray-400 transition" />
           </div>
@@ -88,13 +90,23 @@ function Topbar() {
               </Button>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Avatar
-            className="h-6 w-6 cursor-pointer"
+
+          <div
+            className="flex gap-2 justify-between items-center border-l-2 border-r-2 px-[6px] my-2 border-gray-200 cursor-pointer"
             onClick={() => navigate("/profile")}
           >
-            <AvatarImage src="" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+            <Avatar className="h-6 w-6 ">
+              <AvatarImage src="" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+
+            <div className="flex flex-col ">
+              <span className="text-xs text-purple-600 font-semibold">
+                {user?.name}
+              </span>
+              <span className="text-xs text-gray-500  ">{user?.email}</span>
+            </div>
+          </div>
 
           <Button
             variant="destructive"

@@ -140,6 +140,7 @@ const deleteFile = asyncHandler(async (req, res) => {
 
 const restoreFile = asyncHandler(async (req, res) => {
   const { fileId } = req.params;
+  console.log(req.params);
 
   if (!fileId) {
     throw new ApiError(400, "File is required");
@@ -156,9 +157,9 @@ const restoreFile = asyncHandler(async (req, res) => {
     deleted: { $ne: true },
   });
 
-  if (!parentFolder) {
-    throw new ApiError(400, "Restoration not possible");
-  }
+  // if (!parentFolder) {
+  //   throw new ApiError(400, "Restoration not possible");
+  // }
 
   try {
     file.deleted = false;
@@ -204,12 +205,29 @@ const permanentDeleteFile = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllDeletedFiles = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const files = await File.find({
+      createdBy: userId,
+      deleted: { $ne: false },
+    });
+
+    return res.status(200).json(new ApiResponse(200, files, "Deleted Files"));
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(500, "Internal error");
+  }
+});
+
 export {
   createFile,
   getAllFiles,
   restoreFile,
-  permanentDeleteFile,
   deleteFile,
   updateFile,
   getFile,
+  permanentDeleteFile,
+  getAllDeletedFiles,
 };
