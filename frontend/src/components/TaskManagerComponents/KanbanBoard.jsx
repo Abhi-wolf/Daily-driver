@@ -16,8 +16,6 @@ import { toast } from "sonner";
 export const KanbanBoard = () => {
   const { project, isPending } = useGetProject();
 
-  console.log("PROJECT = ", project);
-
   return (
     <div className=" w-full bg-white text-gray-500 h-full  md:p-4">
       {isPending ? (
@@ -264,7 +262,6 @@ const BurnBarrel = ({ setCards, cards }) => {
     const cardId = e.dataTransfer.getData("cardId");
 
     const projectTasks = cards?.filter((card) => card._id !== cardId);
-    console.log("DELETE CARD = ", projectTasks);
 
     updateProjectTasks(
       { projectId, projectTasks },
@@ -314,7 +311,6 @@ const AddCard = ({ column, setCards, cards }) => {
     };
 
     const projectTasks = [...cards, newCard];
-    console.log("ADD CARD = ", projectTasks);
 
     setCards(projectTasks);
 

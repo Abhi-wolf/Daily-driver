@@ -281,8 +281,6 @@ const renameFolder = asyncHandler(async (req, res) => {
   const { newName } = req.body;
   const userId = req.user._id;
 
-  console.log("BODY = ", req.body);
-
   if (!folderId) {
     throw new ApiError(404, "Folder id is required");
   }
@@ -291,8 +289,6 @@ const renameFolder = asyncHandler(async (req, res) => {
     _id: folderId,
     deleted: { $ne: true },
   });
-
-  console.log("folder = ", folder);
 
   if (!folder || !folder.createdBy.equals(userId)) {
     throw new ApiError("Folder not found");

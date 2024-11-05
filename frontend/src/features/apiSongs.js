@@ -20,7 +20,6 @@ export async function getSongs() {
 
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -42,10 +41,8 @@ export async function uploadSong(formData) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -61,17 +58,13 @@ export async function deleteSong({ songId }) {
       credentials: "include",
     });
 
-    console.log(res);
-
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

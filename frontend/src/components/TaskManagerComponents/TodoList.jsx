@@ -24,8 +24,6 @@ function TodoList({ searchParams, todos }) {
     }
   }, [todos]);
 
-  console.log(filteredTodos);
-
   return (
     <div className="flex-1 p-8 flex flex-col gap-8">
       <div className="flex gap-6">

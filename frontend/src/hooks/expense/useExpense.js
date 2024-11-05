@@ -5,6 +5,7 @@ import {
   deleteExpense as deleteExpenseApi,
   getExpenses,
   getExpensesByMonth,
+  getExpenseSummary,
   updateExpense as updateExpenseApi,
 } from "../../features/apiExpense";
 
@@ -12,7 +13,7 @@ export function useGetExpenses(filter) {
   const { data, error, isPending, isError } = useQuery({
     queryKey: ["expense", filter],
     queryFn: () => getExpenses(filter),
-    enabled: !!filter,
+    enabled: !!filter.start,
   });
 
   return { data, isPending, isError, error };
@@ -29,6 +30,20 @@ export function useGetMonthlyExpenses() {
   });
 
   return { monthlyExpenses, isPending, isError, error };
+}
+
+export function useGetExpenseSummary() {
+  const {
+    data: expenseSummary,
+    error,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["expenseSummary"],
+    queryFn: () => getExpenseSummary(),
+  });
+
+  return { expenseSummary, isPending, isError, error };
 }
 
 export function useUpdateExpense() {

@@ -14,8 +14,6 @@ function InitialExplorer() {
     isError,
   } = useGetUserFileExplorer();
 
-  console.log(isError);
-
   if (isError) {
     return <ErrorMessage message={error?.message || "Something went wrong"} />;
   }

@@ -3,7 +3,6 @@ import { Pie, PieChart, Sector } from "recharts";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -95,15 +94,6 @@ function PieChartExpenses() {
     <Card className={cn("w-[580px] flex flex-col")}>
       <CardHeader className="items-center pb-0">
         <CardTitle>Pie Chart - Category Spendings</CardTitle>
-        <CardDescription className="flex gap-4">
-          <span className="italic text-purple-400">
-            {transformDateWithSlash(start)}
-          </span>
-          <span className="font-semibold text-green-400">TO</span>{" "}
-          <span className="italic text-purple-400">
-            {transformDateWithSlash(end)}
-          </span>
-        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {chartData?.length > 0 ? (
@@ -136,7 +126,14 @@ function PieChartExpenses() {
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
           Showing spending during the period from{" "}
-          {transformDateWithSlash(start)} to {transformDateWithSlash(end)}.
+          <span className="italic text-gray-600 font-semibold mx-1">
+            {transformDateWithSlash(start)}
+          </span>{" "}
+          and{" "}
+          <span className="italic text-gray-600 font-semibold mx-1">
+            {transformDateWithSlash(end)}
+          </span>
+          .
         </div>
       </CardFooter>
     </Card>

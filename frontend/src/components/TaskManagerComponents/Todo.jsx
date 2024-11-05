@@ -12,7 +12,6 @@ function Todo({ todo }) {
 
   function handleStatusChange() {
     const done = !isDone;
-    console.log("updating todo status = ", done);
 
     // Call the update function with the new status
     updateTodoStatus(

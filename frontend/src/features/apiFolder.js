@@ -10,7 +10,6 @@ export async function getFolders() {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
@@ -20,7 +19,6 @@ export async function getFolders() {
 
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -29,8 +27,6 @@ export async function getFolders() {
   }
 }
 export async function getFolder(folderId) {
-  console.log("Folder ID = ", folderId);
-
   try {
     const res = await fetch(`${apiURL}/folders/${folderId}`, {
       method: "GET",
@@ -40,17 +36,14 @@ export async function getFolder(folderId) {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
     }
 
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -70,17 +63,14 @@ export async function createNewFolder({ newData }) {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
     }
 
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -90,9 +80,6 @@ export async function createNewFolder({ newData }) {
 }
 
 export async function renameFolder({ newName, folderId }) {
-  console.log("newName = ", newName);
-  console.log("folderId = ", folderId);
-
   try {
     const res = await fetch(`${apiURL}/folders/${folderId}`, {
       method: "PATCH",
@@ -103,17 +90,14 @@ export async function renameFolder({ newName, folderId }) {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
     }
 
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -137,10 +121,8 @@ export async function deleteFolder({ folderId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -159,7 +141,6 @@ export async function getDeletedFolders() {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
@@ -168,7 +149,6 @@ export async function getDeletedFolders() {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -193,10 +173,8 @@ export async function restoreFolder({ folderId }) {
     }
 
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -220,10 +198,8 @@ export async function permanentDeleteFolder({ folderId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

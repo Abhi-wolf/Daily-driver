@@ -28,12 +28,10 @@ function AddLabelModel() {
 
   const onSubmit = async (newLabel) => {
     try {
-      console.log(newLabel);
       addNewLabel(
         { newLabel },
         {
           onSuccess: (data) => {
-            console.log(data);
             toast.success("Label added successfully");
             onClose(false);
           },

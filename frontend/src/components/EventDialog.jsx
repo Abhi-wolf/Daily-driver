@@ -29,8 +29,6 @@ export default function AddEventDialog({
     formState: { errors },
   } = useForm();
 
-  console.log(selected);
-
   const { addEvent, isPending } = useAddEvent();
 
   const onSubmit = async (data) => {
@@ -49,7 +47,6 @@ export default function AddEventDialog({
         { newEvent },
         {
           onSuccess: (data) => {
-            console.log("eveny data = ", data);
             toast.success("Event Added successfully");
           },
           onError: (err) => {

@@ -17,10 +17,8 @@ export async function getUserFileExplorer() {
     }
 
     const data = await res.json();
-    console.log("explorer = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -30,8 +28,6 @@ export async function getUserFileExplorer() {
 }
 
 export async function updateFileExplorer({ finalTree }) {
-  console.log(finalTree);
-
   try {
     const res = await fetch(`${apiURL}/user/updateFolder`, {
       method: "POST",
@@ -49,10 +45,8 @@ export async function updateFileExplorer({ finalTree }) {
     }
 
     const data = await res.json();
-    console.log("explorer = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

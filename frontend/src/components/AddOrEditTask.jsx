@@ -50,8 +50,6 @@ function AddOrEditTask({ isOpen, onClose, todo }) {
   });
 
   const onSubmit = (newTodo) => {
-    console.log("Form Data: ", newTodo);
-
     try {
       if (!todo) {
         createTodo(
@@ -81,7 +79,6 @@ function AddOrEditTask({ isOpen, onClose, todo }) {
         );
       }
     } catch (error) {
-      console.log(error);
       onClose(false);
     }
   };

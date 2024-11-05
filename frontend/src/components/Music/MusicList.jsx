@@ -69,7 +69,6 @@ function ConfirmDeleteDialog({ songId }) {
   const [isOpen, onClose] = useState(false);
 
   const handleDeleteSong = () => {
-    console.log("songId = ", songId);
     try {
       deleteSong(
         { songId },

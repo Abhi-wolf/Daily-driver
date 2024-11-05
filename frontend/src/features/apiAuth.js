@@ -22,7 +22,6 @@ export async function login({ data }) {
     userDetail = await res.json(); // Parse the response JSON
     return userDetail?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -89,8 +88,6 @@ export async function forgotPassword({ data }) {
 }
 
 export async function resetPassword({ data, token }) {
-  console.log(data, token);
-
   try {
     const res = await fetch(`${apiURL}/user/resetPassword/${token}`, {
       method: "PATCH",
@@ -133,7 +130,6 @@ export async function logout() {
       throw new Error(errorData.message || "Login failed");
     }
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

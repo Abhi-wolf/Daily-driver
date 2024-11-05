@@ -7,9 +7,6 @@ import { Button } from "../ui/button";
 import { useFileUpdateContent } from "../../hooks/fileExplorer/useFile";
 
 const TextEditor = ({ note, fileId }) => {
-  console.log(note);
-  console.log(fileId);
-
   const [editable, setEditable] = useState(false);
   const [editorState, setEditorState] = useState(
     note || `<h4 className="bg-red-500">welcome to your new note`
@@ -51,25 +48,6 @@ const TextEditor = ({ note, fileId }) => {
       editor.commands.setContent(note);
     }
   }, [note, fileId, editor]);
-
-  // const debouncedEditorState = useDebounce(editorState, 900);
-  // useEffect(() => {
-  //   // save to db
-  //   if (debouncedEditorState === "") return;
-  //   const data = editorState;
-
-  //   updateFileContent(
-  //     { data, fileId },
-  //     {
-  //       onSuccess: (data) => {
-  //         console.log("successfully updated = ", data);
-  //       },
-  //       onError: (err) => {
-  //         console.error(err);
-  //       },
-  //     }
-  //   );
-  // }, [debouncedEditorState]);
 
   return (
     <div className="min-h-screen flex flex-col m-2  ">

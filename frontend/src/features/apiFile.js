@@ -11,7 +11,6 @@ export async function createNewFile({ newData }) {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
@@ -20,7 +19,6 @@ export async function createNewFile({ newData }) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -47,7 +45,6 @@ export async function deleteFile({ fileId }) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -57,8 +54,6 @@ export async function deleteFile({ fileId }) {
 }
 
 export async function getFile(fileId) {
-  console.log("FILE ID = ", fileId);
-
   try {
     const res = await fetch(`${apiURL}/files/${fileId}`, {
       method: "GET",
@@ -76,7 +71,6 @@ export async function getFile(fileId) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -86,9 +80,6 @@ export async function getFile(fileId) {
 }
 
 export async function updateFile({ data, fileId }) {
-  console.log("FILE ID = ", fileId);
-  console.log("DATA = ", data);
-
   try {
     const res = await fetch(`${apiURL}/files/${fileId}`, {
       method: "PATCH",
@@ -103,10 +94,8 @@ export async function updateFile({ data, fileId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const file = await res.json();
-    console.log(file);
     return file?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -116,9 +105,6 @@ export async function updateFile({ data, fileId }) {
 }
 
 export async function renameFile({ fileName, fileId }) {
-  console.log("fileName = ", fileName);
-  console.log("fileId = ", fileId);
-
   try {
     const res = await fetch(`${apiURL}/files/${fileId}`, {
       method: "PATCH",
@@ -129,17 +115,14 @@ export async function renameFile({ fileName, fileId }) {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
     }
 
     const data = await res.json();
-    console.log(data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -158,7 +141,6 @@ export async function getDeletedFiles() {
       credentials: "include",
     });
 
-    // console.log(res);
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(errorData.message || "Something went wrong");
@@ -167,7 +149,6 @@ export async function getDeletedFiles() {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -194,7 +175,6 @@ export async function restoreFile({ fileId }) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -218,10 +198,8 @@ export async function permanentDeleteFile({ fileId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

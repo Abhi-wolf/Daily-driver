@@ -7,7 +7,6 @@ export function useDeleteProject() {
   const { mutate: deleteProject, isPending } = useMutation({
     mutationFn: deleteProjectApi,
     onSuccess: (projectId) => {
-      console.log("Deleted project ID:", projectId);
       if (projectId) {
         queryClient.removeQueries({ queryKey: ["project", projectId] });
       }

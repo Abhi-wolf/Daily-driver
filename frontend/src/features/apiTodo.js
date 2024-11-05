@@ -19,7 +19,6 @@ export async function getUserTodos(filter) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -29,8 +28,6 @@ export async function getUserTodos(filter) {
 }
 
 export async function createTodo({ newTodo }) {
-  console.log(newTodo);
-
   try {
     const res = await fetch(`${apiURL}/todos/`, {
       method: "POST",
@@ -50,7 +47,6 @@ export async function createTodo({ newTodo }) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -60,8 +56,6 @@ export async function createTodo({ newTodo }) {
 }
 
 export async function deleteTodo({ todoId }) {
-  console.log("todoId = ", todoId);
-
   try {
     const res = await fetch(`${apiURL}/todos/${todoId}`, {
       method: "DELETE",
@@ -76,10 +70,8 @@ export async function deleteTodo({ todoId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project data delete = ", data);
     return todoId;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -89,9 +81,6 @@ export async function deleteTodo({ todoId }) {
 }
 
 export async function updateTodo({ todoId, newTodo }) {
-  console.log("todoId = ", todoId);
-  console.log("newTodo = ", newTodo);
-
   try {
     const res = await fetch(`${apiURL}/todos/${todoId}`, {
       method: "PATCH",
@@ -107,10 +96,8 @@ export async function updateTodo({ todoId, newTodo }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("event  update = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -120,9 +107,6 @@ export async function updateTodo({ todoId, newTodo }) {
 }
 
 export async function updateTodoStatus({ todoId, done }) {
-  console.log("todoId = ", todoId);
-  console.log("done = ", done);
-
   try {
     const res = await fetch(`${apiURL}/todos/statusupdate/${todoId}`, {
       method: "PATCH",
@@ -138,10 +122,8 @@ export async function updateTodoStatus({ todoId, done }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("event  update = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

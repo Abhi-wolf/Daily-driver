@@ -21,7 +21,6 @@ export default function CalendarComponent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleOpenModal = (event) => {
-    console.log(event);
     setSelectedEvent(event);
     onClose(true);
   };

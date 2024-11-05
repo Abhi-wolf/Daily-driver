@@ -1,13 +1,9 @@
 /* eslint-disable react/prop-types */
 import { Bell, Bookmark, CalendarDaysIcon } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { useState } from "react";
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover.jsx";
 
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -20,8 +16,8 @@ import AddEventDialog from "./EventDialog";
 import TodaysDate from "./TodaysDate";
 
 function Topbar() {
-  const [selected, setSelected] = useState();
-  const [isOpen, onClose] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { removeUser } = useUserStore();
   const { events } = useGetEvent();
@@ -30,15 +26,11 @@ function Topbar() {
   const { logout, isPending } = useLogout();
   const navigate = useNavigate();
 
-  let eventDays = events?.map((event) => ({
-    from: new Date(event.startDate),
-    to: new Date(event.endDate),
-  }));
-
-  const handleSelectDate = (date) => {
-    setSelected(date);
-    onClose(!isOpen);
-  };
+  let eventDays =
+    events?.map((event) => ({
+      from: new Date(event.startDate),
+      to: new Date(event.endDate),
+    })) || [];
 
   const handleLogout = async () => {
     try {
@@ -54,11 +46,11 @@ function Topbar() {
     <header className="w-full border-[1px] border-gray-300 fixed top-0 left-0 z-50">
       <div className="flex justify-between items-center ">
         {/* left */}
-        <div className="flex gap-4 items-center">
+        <ul className="flex gap-4 items-center">
           <li className="list-none cursor-pointer">
             <Bookmark className=" h-5 w-5 hover:text-gray-400 transition" />
           </li>
-        </div>
+        </ul>
 
         {/* today's date */}
         <TodaysDate />
@@ -68,28 +60,45 @@ function Topbar() {
           <div>
             <Bell className=" h-5 w-5 hover:text-gray-400 transition" />
           </div>
-          <DropdownMenu className="mr-4">
-            <DropdownMenuTrigger asChild>
-              <CalendarDaysIcon className=" h-5 w-5 hover:text-gray-400 transition cursor-pointer" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-6 mr-4 flex flex-col gap-4">
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <CalendarDaysIcon className="mr-2 h-5 w-5 cursor-pointer" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto bg-slate-100 mr-4" align="start">
               <DayPicker
+                classNames={{
+                  chevron: "fill-blue-300",
+                  range_start: "bg-blue-400",
+                  range_end: "bg-blue-400",
+                  range_middle: "bg-blue-300",
+                  day_button: "border-none",
+                  today: " bg-orange-400 rounded-full font-semibold",
+                }}
                 mode="range"
+                disabled={[{ before: new Date() }]}
                 selected={selected}
-                onSelect={handleSelectDate}
                 modifiers={{
                   booked: eventDays,
                 }}
                 modifiersClassNames={{
-                  booked: "bg-red-500 text-white rounded-full",
+                  booked: "bg-green-400 text-white rounded-full",
+                }}
+                onSelect={(range) => {
+                  if (range?.from && range?.to) {
+                    setSelected(range);
+                  }
                 }}
               />
 
-              <Button onClick={() => setSelected()} variant="secondary">
-                Clear Selected Dates
-              </Button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <div className="my-2 flex justify-between">
+                <Button onClick={() => setIsOpen(true)}>Book Event</Button>
+                <Button variant="outline" onClick={() => setSelected("")}>
+                  Clear Selected Dates
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <div
             className="flex gap-2 justify-between items-center border-l-2 border-r-2 px-[6px] my-2 border-gray-200 cursor-pointer"
@@ -122,7 +131,7 @@ function Topbar() {
       {isOpen && (
         <AddEventDialog
           isOpen={isOpen}
-          onClose={onClose}
+          onClose={setIsOpen}
           selected={selected}
           setSelected={setSelected}
         />

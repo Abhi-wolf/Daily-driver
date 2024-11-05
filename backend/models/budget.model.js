@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const incomeSchema = new mongoose.Schema({
+const budgetSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
@@ -8,12 +8,18 @@ const incomeSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now(),
     required: true,
   },
-  type: {
+  description: {
     type: String,
+  },
+  amount: {
+    type: Number,
+    default: 0,
+    min: [0, "Amount cannot be lesser than zero"],
   },
 });
 
-export const Income = mongoose.model("Income", incomeSchema);
+budgetSchema.index({ createdBy: 1, date: 1 }, { unique: true });
+
+export const Budget = mongoose.model("Budget", budgetSchema);

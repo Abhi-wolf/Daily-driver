@@ -30,7 +30,6 @@ function TaskManagerSideBar() {
 
   function handleChangeFilter(value) {
     if (location.pathname === "/tasksmanager/todos") {
-      console.log(location.pathname);
       setSearchParams({ filter: value });
     } else {
       navigate(`/tasksmanager/todos?filter=${value}`);

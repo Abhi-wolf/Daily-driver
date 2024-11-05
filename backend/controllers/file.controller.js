@@ -8,8 +8,6 @@ const createFile = asyncHandler(async (req, res) => {
   const { fileName, parentFolder, data } = req.body;
   const userId = req.user._id;
 
-  console.log("body=", req.body);
-
   if (!fileName) {
     throw new ApiError(404, "File name is required");
   }
@@ -44,8 +42,6 @@ const createFile = asyncHandler(async (req, res) => {
 const updateFile = asyncHandler(async (req, res) => {
   const { fileId } = req.params;
   const userId = req.user._id;
-
-  console.log("UPDATE FILE = ", req.body);
 
   if (!fileId) {
     throw new ApiError(404, "File id is required");
@@ -140,7 +136,6 @@ const deleteFile = asyncHandler(async (req, res) => {
 
 const restoreFile = asyncHandler(async (req, res) => {
   const { fileId } = req.params;
-  console.log(req.params);
 
   if (!fileId) {
     throw new ApiError(400, "File is required");

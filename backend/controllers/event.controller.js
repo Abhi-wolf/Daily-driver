@@ -97,8 +97,6 @@ const updateEvent = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
   const userId = req.user._id;
 
-  console.log(eventName, eventDescription, startDate, endDate, eventId);
-
   if (!eventName || !startDate || !eventId) {
     throw new ApiError(400, "All fields are required");
   }

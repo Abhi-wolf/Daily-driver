@@ -29,7 +29,6 @@ export default function ResetPasswordForm() {
   const { token } = useParams();
 
   const onSubmit = async (data) => {
-    console.log(data);
     resetPassword(
       { data, token },
       {
@@ -90,9 +89,6 @@ export default function ResetPasswordForm() {
                     required: true,
                     validate: (match) => {
                       const password = getValues("password");
-
-                      console.log(password, match);
-
                       return (
                         password === match ||
                         "Confirm password should be equal to password"

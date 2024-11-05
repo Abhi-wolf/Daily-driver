@@ -29,7 +29,6 @@ export async function uploadFile(localFilePath) {
 
     const snapshot = await uploadBytes(storageRef, fileBuffer, metadata);
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log("File uploaded successfully:", downloadURL);
 
     // Optionally, delete the local file after upload
     fs.unlinkSync(localFilePath);
@@ -47,9 +46,7 @@ export async function uploadFile(localFilePath) {
 export async function deleteFile(fileUrl) {
   try {
     const fileRef = ref(storage, fileUrl);
-    console.log("fileRef = ", fileRef);
     await deleteObject(fileRef);
-    console.log("File deleted successfully");
   } catch (error) {
     console.error("Error uploading file to Firebase:", error);
     return null;

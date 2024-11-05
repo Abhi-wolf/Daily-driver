@@ -2,8 +2,6 @@ import multer from "multer";
 import fs from "fs";
 
 const multerUpload = (destination) => {
-  console.log("MULTER UPLOAD FUNCTION");
-
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination);
   }

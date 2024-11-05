@@ -29,13 +29,13 @@ export default function Home() {
           <nav className="space-x-4">
             <a
               href="#features"
-              className="text-sm font-medium text-gray-600 hover:text-primary"
+              className="hidden md:inline-block text-sm font-medium text-gray-600 hover:text-primary"
             >
               Features
             </a>
             <a
               href="#about"
-              className="text-sm font-medium text-gray-600 hover:text-primary"
+              className="hidden md:inline-block text-sm font-medium text-gray-600 hover:text-primary"
             >
               About
             </a>
@@ -139,15 +139,19 @@ export default function Home() {
                 With TaskMaster, you&apos;re not just organizing your life -
                 you&apos;re optimizing it.
               </p>
-              <div className="flex justify-center space-x-4">
-                <Button variant="outline" size="lg">
-                  Learn More
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button size="lg">
-                  Join Our Community
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
+              <div className="flex justify-center space-x-4 flex-wrap gap-4">
+                <Link to="/main">
+                  <Button variant="outline" size="lg">
+                    Learn More
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button size="lg">
+                    Join Our Community
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -160,10 +164,12 @@ export default function Home() {
               Join thousands of users who have transformed their productivity
               with TaskMaster.
             </p>
-            <Button size="lg" variant="secondary">
-              Start Your Free Trial
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link to="/login">
+              <Button size="lg" variant="secondary">
+                Start Your Free Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </section>
       </main>

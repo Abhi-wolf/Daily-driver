@@ -38,7 +38,6 @@ function SideCalender() {
   };
 
   const handleOpenModal = (event) => {
-    console.log(event);
     setSelectedEvent(event);
     setOpenEditModal(true);
   };
@@ -46,6 +45,14 @@ function SideCalender() {
   return (
     <div className="w-[400px] flex flex-col items-center gap-10 px-4 py-8 mr-4 bg-slate-100 h-full ">
       <DayPicker
+        classNames={{
+          chevron: "fill-blue-300",
+          range_start: "bg-blue-400",
+          range_end: "bg-blue-400",
+          range_middle: "bg-blue-300",
+          day_button: "border-none",
+          today: " bg-orange-400 rounded-full font-semibold",
+        }}
         mode="range"
         selected={selected}
         onSelect={handleSelectDate}

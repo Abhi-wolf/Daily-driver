@@ -156,7 +156,7 @@ const updateProjectTasks = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    console.log("ERROR = ", error);
+    console.error("ERROR = ", error);
     return res.status(500).json(new ApiError(500, "Internal error"));
   }
 });

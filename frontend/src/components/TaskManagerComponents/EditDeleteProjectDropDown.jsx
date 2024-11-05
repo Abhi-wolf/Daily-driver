@@ -28,8 +28,6 @@ function EditDeleteProjectDropDown({ projectId }) {
   const navigate = useNavigate();
 
   const handleDeleteProject = async () => {
-    console.error("HANDLE DELETE");
-
     deleteProject(
       { projectId },
       {
@@ -39,7 +37,6 @@ function EditDeleteProjectDropDown({ projectId }) {
           navigate("/tasksmanager");
         },
         onError: (error) => {
-          console.log(error);
           toast.error(error?.message);
         },
       }

@@ -8,8 +8,6 @@ export async function sendEmail(options) {
     },
   });
 
-  console.log(process.env.EMAIL_USER);
-
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: options.email,
@@ -19,7 +17,6 @@ export async function sendEmail(options) {
 
   try {
     const info = await transporter.sendMail(mailOptions); // Use await here
-    console.log("Email sent: ", info.response);
   } catch (error) {
     console.error("Error in sending email:", error.message); // Handle error properly
     throw new Error("Error in sending email");

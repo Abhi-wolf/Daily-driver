@@ -17,11 +17,9 @@ export async function getProjects() {
     }
 
     const data = await res.json();
-    console.log("project data = ", data);
 
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -48,10 +46,8 @@ export async function addNewProject({ newProject }) {
     }
 
     const data = await res.json();
-    console.log("project data = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -61,8 +57,6 @@ export async function addNewProject({ newProject }) {
 }
 
 export async function getProject({ projectId }) {
-  // console.log("projectId = ", projectId);
-
   if (!projectId) return null;
 
   try {
@@ -79,10 +73,8 @@ export async function getProject({ projectId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    // console.log("project data = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -92,8 +84,6 @@ export async function getProject({ projectId }) {
 }
 
 export async function deleteProject({ projectId }) {
-  console.log("projectId = ", projectId);
-
   try {
     const res = await fetch(`${apiURL}/project/${projectId}`, {
       method: "DELETE",
@@ -108,10 +98,8 @@ export async function deleteProject({ projectId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project data delete = ", data);
     return projectId;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -121,9 +109,6 @@ export async function deleteProject({ projectId }) {
 }
 
 export async function updateProjectTasks({ projectId, projectTasks }) {
-  console.log("projectId = ", projectId);
-  console.log("projectTasks = ", projectTasks);
-
   try {
     const res = await fetch(`${apiURL}/project/${projectId}`, {
       method: "PUT",
@@ -139,10 +124,8 @@ export async function updateProjectTasks({ projectId, projectTasks }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project task update = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

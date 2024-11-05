@@ -20,7 +20,6 @@ export async function getLabels() {
 
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -47,10 +46,8 @@ export async function addNewLabel({ newLabel }) {
     }
 
     const data = await res.json();
-    console.log("project data = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -60,8 +57,6 @@ export async function addNewLabel({ newLabel }) {
 }
 
 export async function deleteLabel({ labelId }) {
-  console.log("labelId = ", labelId);
-
   try {
     const res = await fetch(`${apiURL}/label/${labelId}`, {
       method: "DELETE",
@@ -77,7 +72,6 @@ export async function deleteLabel({ labelId }) {
     }
 
     const data = await res.json();
-    console.log("LABEL DELETE FUNCTION = ", data);
     return null;
   } catch (error) {
     console.error(error);

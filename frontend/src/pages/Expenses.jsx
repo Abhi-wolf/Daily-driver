@@ -1,5 +1,4 @@
 import { useSearchParams } from "react-router-dom";
-import AddExpenseBtn from "../components/ExpenseTracker/AddExpenseBtn";
 import BarChart from "../components/ExpenseTracker/BarChart";
 import ExpenseInfo from "../components/ExpenseTracker/ExpenseInfo";
 import ExpenseTable from "../components/ExpenseTracker/ExpenseTable";
@@ -37,9 +36,8 @@ function Expenses() {
   }, [startDate, endDate]);
 
   return (
-    <section className="w-full m-2 p-2 flex flex-col gap-6 overflow-y-auto relative">
+    <section className="w-full m-2 flex flex-col gap-6 overflow-y-auto relative">
       <ExpenseInfo />
-      <AddExpenseBtn />
       <div className="flex justify-around">
         <BarChart />
         <PieChart />

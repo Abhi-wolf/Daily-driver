@@ -25,8 +25,6 @@ export const useMusicStore = create((set) => ({
       // Replace the queue with the new list from the backend
       const finalQueue = tracks;
 
-      console.log("finalQueue = ", finalQueue);
-
       // Reset currentTrackIndex to 0 if there are songs, otherwise -1
       const newIndex = finalQueue.length > 0 ? 0 : -1;
 

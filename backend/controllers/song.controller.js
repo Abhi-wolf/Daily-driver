@@ -8,8 +8,6 @@ import { deleteFile, uploadFile } from "../utils/uploadFile.js";
 const addSong = asyncHandler(async (req, res) => {
   const { songName, songImageUrl, playListName } = req.body;
 
-  console.log(req.body);
-
   if (!songName) {
     throw new ApiError(400, "All fields are required");
   }
@@ -61,7 +59,7 @@ const addSong = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, song, "Song successfully uploaded"));
   } catch (error) {
-    console.log("error = ", error);
+    console.error("error = ", error);
     return res.status(500).json(new ApiError(500, "Internal error"));
   }
 });

@@ -291,7 +291,7 @@ const updateFolder = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, fileExplore, "Successfully updated"));
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json(new ApiError(500, "Internal Error"));
   }
 });
@@ -316,7 +316,7 @@ const userFileExplorer = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, data, "Successfully fetched"));
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json(new ApiError(500, "Internal Error"));
   }
 });

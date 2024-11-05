@@ -54,17 +54,14 @@ export default function EditOrDeleteEventDialog({ isOpen, onClose, event }) {
         { eventId, newEvent },
         {
           onSuccess: (newEvent) => {
-            console.log("eveny newEvent = ", newEvent);
             toast.success("Event updated successfully");
           },
           onError: (err) => {
             toast.error(err.message);
-            console.log(err.message);
           },
         }
       );
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong.");
     }
 

@@ -29,12 +29,10 @@ export function LoginForm() {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    console.log(data);
     login(
       { data },
       {
         onSuccess: (data) => {
-          console.log("user = ", data);
           if (data?.user?.email) {
             setUser(data?.user);
             toast.success("Login successfull", data?.user?.email);
@@ -43,7 +41,6 @@ export function LoginForm() {
         },
         onError: (err) => {
           toast.error(err.message);
-          console.log(err.message);
           navigate("/login");
         },
       }

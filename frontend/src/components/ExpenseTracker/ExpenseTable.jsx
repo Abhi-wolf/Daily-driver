@@ -15,7 +15,7 @@ import EditOrDeleteExpenseDropDown from "./EditOrDeleteExpenseDropDown";
 import { useGetExpenses } from "../../hooks/expense/useExpense";
 import { MediumSpinner } from "../Spinners";
 import { useSearchParams } from "react-router-dom";
-import { transformDate } from "../../lib/utils";
+import { transformDate, transformDateWithSlash } from "../../lib/utils";
 
 function ExpenseTable() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,18 +25,20 @@ function ExpenseTable() {
 
   const { data, isPending } = useGetExpenses({ start, end });
 
-  // State for start and end dates
   const [startDate, setStartDate] = useState(start);
   const [endDate, setEndDate] = useState(end);
 
-  // Update the search parameters whenever the dates change
+  useEffect(() => {
+    if (start) setStartDate(start);
+    if (end) setEndDate(end);
+  }, [start, end]);
+
   useEffect(() => {
     if (!startDate || !endDate) return;
 
     const params = new URLSearchParams();
     if (startDate) params.set("start", startDate);
     if (endDate) params.set("end", endDate);
-    // navigate({ search: params.toString() });
 
     setSearchParams({ startDate, endDate });
   }, [startDate, endDate]);
@@ -67,7 +69,17 @@ function ExpenseTable() {
 
       {/* Table with Conditional Rendering */}
       <Table className="text-md">
-        <TableCaption>A list of your recent expenses.</TableCaption>
+        <TableCaption>
+          A list of your expenses between{" "}
+          <span className="italic text-gray-600 font-semibold mx-1">
+            {transformDateWithSlash(startDate)}
+          </span>
+          and{" "}
+          <span className="italic text-gray-600 font-semibold mx-1">
+            {transformDateWithSlash(endDate)}
+          </span>
+          .
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[200px] overflow-hidden">

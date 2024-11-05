@@ -1,14 +1,11 @@
 const apiURL = import.meta.env.VITE_BASE_URL;
 
 export async function getExpenses(filter) {
-  // console.error(start, end);
-  // const filter = "";
-
-  console.log(filter);
+  if (!filter) return null;
 
   try {
     const res = await fetch(
-      `${apiURL}/expense/?startDate=${filter.start}&endDate=${filter.end}`,
+      `${apiURL}/expense/?startDate=${filter?.start}&endDate=${filter?.end}`,
       {
         method: "GET",
         headers: {
@@ -26,10 +23,9 @@ export async function getExpenses(filter) {
 
     const data = await res.json();
 
-    console.log(data?.data);
     return data?.data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -57,7 +53,32 @@ export async function getExpensesByMonth() {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
+    if (err.response) {
+      console.error(err.response.data.message);
+      throw new Error(err.response.data.message);
+    }
+    throw new Error(err);
+  }
+}
+export async function getExpenseSummary() {
+  try {
+    const res = await fetch(`${apiURL}/expense/expenseSummary/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Sends cookies and credentials with the request
+    });
+
+    // Check if the response is okay (status 200-299)
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Something went wrong");
+    }
+
+    const data = await res.json();
+    return data?.data;
+  } catch (err) {
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -67,8 +88,6 @@ export async function getExpensesByMonth() {
 }
 
 export async function createExpense({ data }) {
-  console.log(data);
-
   try {
     const res = await fetch(`${apiURL}/expense/`, {
       method: "POST",
@@ -88,7 +107,6 @@ export async function createExpense({ data }) {
     const expense = await res.json();
     return expense?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -98,8 +116,6 @@ export async function createExpense({ data }) {
 }
 
 export async function deleteExpense({ expenseId }) {
-  console.log("expenseId = ", expenseId);
-
   try {
     const res = await fetch(`${apiURL}/expense/${expenseId}`, {
       method: "DELETE",
@@ -114,10 +130,8 @@ export async function deleteExpense({ expenseId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project data delete = ", data);
     return expenseId;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -127,9 +141,6 @@ export async function deleteExpense({ expenseId }) {
 }
 
 export async function updateExpense({ expenseId, data }) {
-  console.log("expenseId = ", expenseId);
-  console.log("data = ", data);
-
   try {
     const res = await fetch(`${apiURL}/expense/${expenseId}`, {
       method: "PATCH",
@@ -145,10 +156,8 @@ export async function updateExpense({ expenseId, data }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const expense = await res.json();
-    console.log("expense  update = ", expense);
     return expense?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

@@ -19,7 +19,6 @@ export async function getUserEvents() {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -48,7 +47,6 @@ export async function addEvent({ newEvent }) {
     const data = await res.json();
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -58,8 +56,6 @@ export async function addEvent({ newEvent }) {
 }
 
 export async function deleteEvent({ eventId }) {
-  console.log("projectId = ", eventId);
-
   try {
     const res = await fetch(`${apiURL}/event/${eventId}`, {
       method: "DELETE",
@@ -74,10 +70,8 @@ export async function deleteEvent({ eventId }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("project data delete = ", data);
     return eventId;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);
@@ -87,9 +81,6 @@ export async function deleteEvent({ eventId }) {
 }
 
 export async function updateEvent({ eventId, newEvent }) {
-  console.log("eventId = ", eventId);
-  console.log("newEvent = ", newEvent);
-
   try {
     const res = await fetch(`${apiURL}/event/${eventId}`, {
       method: "PUT",
@@ -105,10 +96,8 @@ export async function updateEvent({ eventId, newEvent }) {
       throw new Error(errorData.message || "Something went wrong");
     }
     const data = await res.json();
-    console.log("event  update = ", data);
     return data?.data;
   } catch (err) {
-    console.log(err);
     if (err.response) {
       console.error(err.response.data.message);
       throw new Error(err.response.data.message);

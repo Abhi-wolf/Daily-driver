@@ -31,8 +31,6 @@ function AddFileOrFolder({ isOpen, onClose, isFolder }) {
     // Fetch existing contents (folders and files)
     const existingItems = explorerData || [];
 
-    console.log("existingItems = ", existingItems);
-
     // Check if a folder/file with the same name already exists
     let duplicate;
     if (isFolder) {
@@ -48,8 +46,6 @@ function AddFileOrFolder({ isOpen, onClose, isFolder }) {
           : item.fileName.toLowerCase() === newData.fileName.toLowerCase()
       );
     }
-
-    console.log("duplicate = ", duplicate);
 
     if (duplicate) {
       toast.error("A file or folder with this name already exists.");

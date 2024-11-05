@@ -22,11 +22,6 @@ export default function Uploader() {
       formData.append("songFile", file); // Append the actual file
       formData.append("songName", file.name); // Append the file name
 
-      console.log(formData);
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-
       try {
         uploadSong(formData, {
           onSuccess: () => {

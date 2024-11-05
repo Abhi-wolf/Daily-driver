@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Budget } from "../models/budget.model.js";
 
 const addExpense = asyncHandler(async (req, res) => {
   const { category, description, date, amount, modeOfPayment } = req.body;
@@ -93,13 +94,13 @@ const deleteExpense = asyncHandler(async (req, res) => {
 
 const getExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  const { startDate, endDate } = req.query;
+
+  console.log(req.query);
 
   try {
-    const { startDate, endDate } = req.query;
-
-    const date = new Date();
-    const start = startDate ? new Date(startDate) : new Date();
-    const end = endDate ? new Date(endDate) : new Date();
+    const start = startDate === "null" ? new Date() : new Date(startDate);
+    const end = endDate === "null" ? new Date() : new Date(endDate);
 
     end.setHours(23, 59, 59, 999);
 
@@ -236,10 +237,93 @@ const getExpensesByMonth = asyncHandler(async (req, res) => {
   }
 });
 
+const getExpenseSummary = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const currMonth = new Date().getMonth();
+  const currYear = new Date().getFullYear();
+
+  try {
+    let currentMonthBudget = await Budget.findOne({
+      createdBy: userId,
+      date: new Date(currYear, currMonth, 1),
+    });
+
+    currentMonthBudget = currentMonthBudget?.amount || 0;
+    let prevMonthBudget = await Budget.findOne({
+      createdBy: userId,
+      date: new Date(currYear, currMonth - 1, 0),
+    });
+
+    prevMonthBudget = prevMonthBudget?.amount || 0;
+
+    let currentMonthExpenses = await Expense.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+          date: {
+            $gte: new Date(currYear, currMonth, 1),
+            $lt: new Date(currYear, currMonth + 1, 0),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$date" },
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    let prevoiusMonthExpenses = await Expense.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+          date: {
+            $gte: new Date(currYear, currMonth - 1, 0),
+            $lt: new Date(currYear, currMonth, 1),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$date" },
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    currentMonthExpenses = currentMonthExpenses[0]?.totalAmount || 0;
+    prevoiusMonthExpenses = prevoiusMonthExpenses[0]?.totalAmount || 0;
+
+    const currentMonthSavings = currentMonthBudget - currentMonthExpenses;
+    const prevMonthSavings = prevMonthBudget - prevoiusMonthExpenses;
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          currentMonthBudget,
+          prevMonthBudget,
+          currentMonthExpenses,
+          prevoiusMonthExpenses,
+          currentMonthSavings,
+          prevMonthSavings,
+        },
+        "Expense summary successfully calculated"
+      )
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(new ApiError(500, "Internal error"));
+  }
+});
+
 export {
   addExpense,
   getExpenses,
   updateExpense,
   deleteExpense,
+  getExpenseSummary,
   getExpensesByMonth,
 };

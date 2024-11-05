@@ -5,16 +5,19 @@ import {
   deleteExpense,
   getExpenses,
   getExpensesByMonth,
+  getExpenseSummary,
   updateExpense,
 } from "../controllers/expense.controller.js";
 
 const router = Router();
 
 router.route("/").post(verifyJWT, addExpense);
+router.route("/").get(verifyJWT, getExpenses);
+
 router.route("/:expenseId").delete(verifyJWT, deleteExpense);
 router.route("/:expenseId").patch(verifyJWT, updateExpense);
 
-router.route("/").get(verifyJWT, getExpenses);
+router.route("/expenseSummary").get(verifyJWT, getExpenseSummary);
 router.route("/monthlyExpenses").get(verifyJWT, getExpensesByMonth);
 
 export default router;

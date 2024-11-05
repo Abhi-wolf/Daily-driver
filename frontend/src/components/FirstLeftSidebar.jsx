@@ -15,10 +15,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddOrEditTask from "./AddOrEditTask";
 import ToolTip from "./ToolTip";
+import { CommandDialogMenu } from "./CommandDialogMenu";
 
 function FirstLeftSidebar() {
   const navigate = useNavigate();
-
+  const [showCommandDialog, setShowCommandDialog] = useState(false);
   const [addNewTaskModal, setAddNewTaskModal] = useState(false);
 
   return (
@@ -34,7 +35,10 @@ function FirstLeftSidebar() {
                 <FolderPlus className="h-5 w-5 hover:text-gray-400 transition" />
               </ToolTip>
             </li>
-            <li className="list-none cursor-pointer">
+            <li
+              className="list-none cursor-pointer"
+              onClick={() => setShowCommandDialog(true)}
+            >
               <ToolTip text="Command menu">
                 <Command className="h-5 w-5 hover:text-gray-400 transition " />
               </ToolTip>
@@ -100,16 +104,10 @@ function FirstLeftSidebar() {
             />
           )}
 
-          {/* <div className="flex flex-col justify-center gap-8 p-1 m-2 ">
-            <li
-              className="list-none cursor-pointer"
-              onClick={() => navigate("/profile")}
-            >
-              <ToolTip text="Settings">
-                <Settings className="h-5 w-5 hover:text-gray-400 transition" />
-              </ToolTip>
-            </li>
-          </div> */}
+          {/* <CommandDialogMenu
+            open={showCommandDialog}
+            setOpen={setShowCommandDialog}
+          /> */}
         </div>
       </div>
     </>
