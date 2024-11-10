@@ -39,7 +39,7 @@ function FirstLeftSidebar() {
               className="list-none cursor-pointer"
               onClick={() => setShowCommandDialog(true)}
             >
-              <ToolTip text="Command menu">
+              <ToolTip text="⌘ J">
                 <Command className="h-5 w-5 hover:text-gray-400 transition " />
               </ToolTip>
             </li>
@@ -104,10 +104,10 @@ function FirstLeftSidebar() {
             />
           )}
 
-          {/* <CommandDialogMenu
+          <CommandDialogMenu
             open={showCommandDialog}
             setOpen={setShowCommandDialog}
-          /> */}
+          />
         </div>
       </div>
     </>

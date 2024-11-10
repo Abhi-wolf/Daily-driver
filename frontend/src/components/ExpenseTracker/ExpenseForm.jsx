@@ -50,8 +50,6 @@ function ExpenseForm({ onClose, isOpen, expense, mode = "create" }) {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
-
     if (mode == "create") {
       addExpense(
         { data },

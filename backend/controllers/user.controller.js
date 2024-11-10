@@ -95,6 +95,8 @@ const registerUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
+    maxAge: 5 * 24 * 60 * 60 * 1000,
   };
 
   // set the cookies and return email and name with the response object
@@ -131,6 +133,10 @@ const loginUser = asyncHandler(async (req, res) => {
   // destructure email and password from the request body
   const { email, password } = req.body;
 
+  console.log("BODY = ", req.body);
+  const url = req.originalUrl; // full URL (including query string)
+  console.log("Request URL:", url);
+
   // return a new error with status code 400 if email or password is not found in the request body
   if (!email || !password) {
     throw new ApiError(400, "Email and password both are required");
@@ -161,6 +167,8 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
+    maxAge: 5 * 24 * 60 * 60 * 1000,
   };
 
   // set the cookies and return email and name with the response object
@@ -177,6 +185,8 @@ const loginUser = asyncHandler(async (req, res) => {
             name: existinguser.name,
             profilePic: existinguser.profilePic,
           },
+          taskLabels: existinguser.labels,
+          bookmarkLabels: existinguser.bookmarkLabels,
           accessToken,
           refreshToken,
         },

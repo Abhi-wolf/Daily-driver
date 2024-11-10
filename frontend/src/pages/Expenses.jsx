@@ -31,7 +31,6 @@ function Expenses() {
         endDate: endOfMonth,
       });
 
-      console.log("Setting default dates:", { startOfMonth, endOfMonth });
     }
   }, [startDate, endDate]);
 

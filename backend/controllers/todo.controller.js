@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createTodo = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { todoName, todoDescription, dueDate, label, priority } = req.body;
 
   if (!todoName || !label) {

@@ -12,12 +12,16 @@ import folderRouter from "./routes/folder.routes.js";
 import fileRouter from "./routes/file.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
 import budgetRouter from "./routes/budget.routes.js";
+import bookMarkRouter from "./routes/bookmark.routes.js";
 import { limiter } from "./middlewares/rateLimit.middleware.js";
 
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow requests from this origin
+    origin: [
+      "http://localhost:5173",
+      "https://daily-driver-frontend.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true, // Allow cookies to be sent with requests
   })
@@ -42,6 +46,7 @@ app.use("/api/v1/folders", folderRouter);
 app.use("/api/v1/files", fileRouter);
 app.use("/api/v1/expense", expenseRouter);
 app.use("/api/v1/budget", budgetRouter);
+app.use("/api/v1/bookmarks", bookMarkRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

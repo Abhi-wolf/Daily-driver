@@ -81,6 +81,15 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+
+    bookmarkLabels: [
+      {
+        bookmarkLabelName: {
+          type: String,
+          required: [true, "Label name is required"],
+        },
+      },
+    ],
   },
   {
     timestamps: true,
