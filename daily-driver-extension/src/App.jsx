@@ -34,7 +34,6 @@ function App() {
   useEffect(() => {
     async function getTokensFromStorage() {
       const tokens = await getTokens();
-      console.log("TOKENS FROM STORAGE = ", tokens);
 
       if (tokens?.accessToken) {
         setIsAuthenticated(true);

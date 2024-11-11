@@ -1,133 +1,132 @@
-import { useState, useEffect } from "react";
-import { Clock, Play, Pause, RotateCcw } from "lucide-react";
+/* eslint-disable no-undef */
+import { useEffect, useState } from "react";
+import { Play, Pause, RotateCcw, Clock } from "lucide-react";
 
-export default function PomodoroWatch() {
-  const [timeLeft, setTimeLeft] = useState(25 * 60); // Time left in seconds
-  const [isActive, setIsActive] = useState(false); // Is the timer active?
-  const [isWork, setIsWork] = useState(true); // Are we in work or break mode?
-  const [pomodorosCompleted, setPomodorosCompleted] = useState(0); // Count of completed Pomodoros
-  const [workDuration, setWorkDuration] = useState(25); // Work duration in minutes
-  const [breakDuration, setBreakDuration] = useState(5); // Break duration in minutes
+function PomodoroWatch() {
+  const [time, setTime] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
 
-  // Load saved state from chrome.storage when component mounts
   useEffect(() => {
-    chrome.storage.local.get(
-      [
-        "timeLeft",
-        "isActive",
-        "isWork",
-        "pomodorosCompleted",
-        "workDuration",
-        "breakDuration",
-      ],
-      (result) => {
-        if (result.timeLeft !== undefined) setTimeLeft(result.timeLeft);
-        if (result.isActive !== undefined) setIsActive(result.isActive);
-        if (result.isWork !== undefined) setIsWork(result.isWork);
-        if (result.pomodorosCompleted !== undefined)
-          setPomodorosCompleted(result.pomodorosCompleted);
-        if (result.workDuration !== undefined)
-          setWorkDuration(result.workDuration);
-        if (result.breakDuration !== undefined)
-          setBreakDuration(result.breakDuration);
-      }
-    );
+    chrome.runtime.sendMessage({ action: "getState" }, (response) => {
+      setTime(response.timeLeft);
+      setIsRunning(response.isRunning);
+    });
   }, []);
 
-  // Format time into MM:SS format
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+  const startTimer = () => {
+    chrome.runtime.sendMessage({ action: "start" });
+    setIsRunning(true);
   };
 
-  // Toggle the timer (start or pause)
-  const toggleTimer = () => {
-    if (isActive) {
-      chrome.runtime.sendMessage({ action: "pauseTimer" });
-      setIsActive(false);
-    } else {
-      chrome.runtime.sendMessage({ action: "startTimer" });
-      setIsActive(true);
-    }
+  const stopTimer = () => {
+    chrome.runtime.sendMessage({ action: "stop" });
+    setIsRunning(false);
   };
 
-  // Reset the timer to initial values
   const resetTimer = () => {
-    chrome.runtime.sendMessage({ action: "resetTimer" });
-    setIsActive(false);
-    setIsWork(true);
-    setTimeLeft(workDuration * 60); // Reset to work duration
-    setPomodorosCompleted(0);
+    chrome.runtime.sendMessage({ action: "reset" });
+    setTime(25 * 60);
+    setIsRunning(false);
+  };
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    return `${String(minutes).padStart(2, 0)} : ${String(secs).padStart(2, 0)}`;
   };
 
-  // Update progress bar calculation
-  const progress = isWork
-    ? ((workDuration * 60 - timeLeft) / (workDuration * 60)) * 100
-    : ((breakDuration * 60 - timeLeft) / (breakDuration * 60)) * 100;
+  const setCustomTime = (minutes) => {
+    const newTime = minutes * 60;
+    setTime(newTime);
+    chrome.runtime.sendMessage({ action: "setNewTime", time: newTime });
+  };
+
+  useEffect(() => {
+    let interval;
+    if (isRunning) {
+      interval = setInterval(() => {
+        chrome.runtime.sendMessage({ action: "getState" }, (response) => {
+          setTime(response.timeLeft);
+          setIsRunning(response.isRunning);
+        });
+      }, 10000);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
   return (
-    <div className="w-[350px] p-2 bg-gray-100  rounded-lg ">
-      <h1 className="text-2xl font-bold text-center mb-4">Pomodoro Timer</h1>
-      <div className="flex justify-between mb-4">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="workDuration" className="p-1">
-            Work (min)
-          </label>
-          <input
-            id="workDuration"
-            type="number"
-            value={workDuration}
-            onChange={(e) => setWorkDuration(Number(e.target.value))}
-            className="w-20 p-2 rounded-lg shadow-md"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="breakDuration" className="p-1 ">
-            Break (min)
-          </label>
-          <input
-            id="breakDuration"
-            type="number"
-            value={breakDuration}
-            onChange={(e) => setBreakDuration(Number(e.target.value))}
-            className="w-20 p-2 rounded-lg shadow-md"
-          />
-        </div>
-      </div>
-      <div className="mb-4">
-        <div className="flex items-center justify-center text-4xl font-bold mb-2">
-          <Clock className="mr-2" />
-          {formatTime(timeLeft)}
-        </div>
-        <div className="text-center text-sm font-medium mb-2">
-          {isWork ? "Work Time" : "Break Time"}
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-      </div>
-      <div className="flex justify-between mb-4">
-        <button
-          onClick={toggleTimer}
-          className="px-4 py-2 bg-black border-2 border-stone-300 rounded-lg flex justify-center items-center text-white"
+    <div className="w-[350px] h-[380px] bg-gray-600 text-gray-100 rounded-2xl p-4 flex flex-col items-center justify-between font-sans shadow-lg">
+      <h2 className="text-2xl font-bold">Pomodoro Timer</h2>
+      <div className="w-48 h-48 rounded-full bg-gray-800 flex items-center justify-center shadow-inner flex-col gap-2">
+        <div className="text-4xl font-bold">{formatTime(time)}</div>
+        <div
+          className={`${
+            isRunning ? "text-green-400" : "text-red-400"
+          } text-sm font-semibold flex gap-2`}
         >
-          {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
-          {isActive ? "Pause" : "Start"}
+          <span
+            className={`w-4 h-4 ${
+              isRunning ? "bg-green-400" : "bg-red-400"
+            } rounded-full`}
+          ></span>
+          <span>{isRunning ? "Running " : "Paused"}</span>
+        </div>
+
+        <div className="text-[8px] text-white">
+          Updation after every 10 seconds...
+        </div>
+      </div>
+      <div className="w-full mb-4">
+        <label htmlFor="custom-time" className="flex items-center mb-2">
+          <Clock className="w-4 h-4 mr-2" />
+          <span className="text-sm">Set Timer (minutes):</span>
+        </label>
+        <input
+          id="custom-time"
+          type="range"
+          min="1"
+          max="60"
+          value={Math.floor(time / 60)}
+          onChange={(e) => setCustomTime(parseInt(e.target.value))}
+          className="w-full accent-blue-500"
+        />
+        <div className="flex justify-between text-xs mt-1">
+          <span>1</span>
+          <span>{time}</span>
+          <span>60</span>
+        </div>
+      </div>
+      <div className="flex justify-between w-full">
+        <button
+          onClick={startTimer}
+          disabled={isRunning}
+          className={`bg-green-500 text-white rounded-lg px-3 py-2 flex items-center justify-center ${
+            isRunning ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+          }`}
+        >
+          <Play className="w-4 h-4 mr-1" />
+          Start
+        </button>
+        <button
+          onClick={stopTimer}
+          disabled={!isRunning}
+          className={`bg-yellow-500 text-white rounded-lg px-3 py-2 flex items-center justify-center ${
+            !isRunning ? "opacity-50 cursor-not-allowed" : "hover:bg-yellow-600"
+          }`}
+        >
+          <Pause className="w-4 h-4 mr-1" />
+          Pause
         </button>
         <button
           onClick={resetTimer}
-          className="px-4 py-2 border-2 border-stone-300 flex gap-2 rounded-lg justify-center items-center"
+          className="bg-red-500 text-white rounded-lg px-3 py-2 flex items-center justify-center hover:bg-red-600"
         >
-          <RotateCcw className="mr-2" />
+          <RotateCcw className="w-4 h-4 mr-1" />
           Reset
         </button>
       </div>
     </div>
   );
 }
+
+export default PomodoroWatch;

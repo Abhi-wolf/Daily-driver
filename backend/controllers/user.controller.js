@@ -133,10 +133,6 @@ const loginUser = asyncHandler(async (req, res) => {
   // destructure email and password from the request body
   const { email, password } = req.body;
 
-  console.log("BODY = ", req.body);
-  const url = req.originalUrl; // full URL (including query string)
-  console.log("Request URL:", url);
-
   // return a new error with status code 400 if email or password is not found in the request body
   if (!email || !password) {
     throw new ApiError(400, "Email and password both are required");

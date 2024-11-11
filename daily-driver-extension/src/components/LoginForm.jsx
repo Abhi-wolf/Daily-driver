@@ -19,7 +19,6 @@ function LoginForm({ setIsLoggedIn }) {
     try {
       setIsLoading(true);
       const res = await loginUser(data);
-      console.log(res);
       if (res?.user) {
         handleUser(res?.user);
       }

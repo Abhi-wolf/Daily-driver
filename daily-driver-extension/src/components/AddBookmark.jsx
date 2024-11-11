@@ -28,7 +28,6 @@ function AddBookmark() {
     try {
       const res = await addBookMark(data);
 
-      console.log("bookmark = ", res);
       if (res.status === 200) {
         setMessage("Bookmark added successfully");
         reset();

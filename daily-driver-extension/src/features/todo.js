@@ -23,7 +23,6 @@ export async function addTodo(data) {
 export async function addBookMark(data) {
   try {
     const response = await api.post("/bookmarks", data);
-    console.log(response);
     return response;
   } catch (error) {
     if (error.response) {

@@ -3,11 +3,9 @@
 // Store tokens by sending a message to the background script
 export const setTokens = (accessToken, refreshToken) => {
   return new Promise((resolve) => {
-    console.log("Setting tokens:", accessToken, refreshToken); // Add this
     chrome.runtime.sendMessage(
       { action: "setTokens", accessToken, refreshToken },
       (response) => {
-        console.log("Set token response:", response); // Add this
         resolve(response);
       }
     );

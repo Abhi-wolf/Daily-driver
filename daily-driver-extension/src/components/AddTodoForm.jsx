@@ -9,7 +9,6 @@ function AddTodoForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { taskLabels } = useUser();
 
-  console.log("FROM ADD TODO FORM = ", taskLabels);
   const {
     register,
     reset,
@@ -18,8 +17,6 @@ function AddTodoForm() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
-
     setIsLoading(true);
 
     if (data.priority === "on") {
@@ -31,7 +28,6 @@ function AddTodoForm() {
     try {
       const res = await addTodo(data);
 
-      console.log("todo form = ", res);
       if (res.status === 200) {
         reset();
       }
